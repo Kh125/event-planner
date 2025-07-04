@@ -20,7 +20,7 @@ backend/env/
 backend/venv/
 backend/ENV/
 backend/.venv/
-
+venv/
 
 # Virtual Environments
 backend/venv/

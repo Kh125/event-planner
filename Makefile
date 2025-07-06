@@ -136,7 +136,7 @@ clean: all
 	@echo "Cleanup complete."
 
 help:
-	@echo "\n\033[1;34mTalentCloud Project Management\033[0m"
+	@echo "\n\033[1;34mProject Management\033[0m"
 	@echo "\033[0;36mUsage: make [target]\033[0m\n"
 	
 	@echo "\033[1;33mEnvironment Setup:\033[0m"

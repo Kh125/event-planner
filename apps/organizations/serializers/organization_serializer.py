@@ -5,17 +5,12 @@ class OrganizationCreateSerializer(serializers.ModelSerializer):
      class Meta:
           model = Organization
           fields = [
-               'name', 'slug', 'organization_type', 'description', 'website', 'logo',
-               'contact_email', 'phone', 'address', 'city', 'country'
+               'id', 'name', 'slug', 'organization_type', 'description', 'website', 'logo',
+               'contact_email', 'phone', 'address', 'city', 'country', 'created_at', 'updated_at'
           ]
           extra_kwargs = {
-               'slug': {'required': False}
+               'slug': {'required': False},
+               'id': {'read_only': True},
+               'created_at': {'read_only': True},
+               'updated_at': {'read_only': True}
           }
-
-     def create(self, validated_data):
-          request = self.context['request']
-          
-          if Organization.objects.filter(created_by=request.user).exists():
-               raise serializers.ValidationError("You already have an organization.")
-          
-          return Organization.objects.create(created_by=request.user, **validated_data)

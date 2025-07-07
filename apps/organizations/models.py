@@ -29,12 +29,12 @@ class Organization(TimeStampModel):
      linkedin = models.URLField(blank=True, null=True)
      instagram = models.URLField(blank=True, null=True)
 
-     created_by = models.ForeignKey(
+     created_by = models.OneToOneField(
           'users.CustomUser',
           on_delete=models.SET_NULL,
           null=True,
           blank=True,
-          related_name='created_organizations'
+          related_name='created_organization'
      )
 
      def save(self, *args, **kwargs):

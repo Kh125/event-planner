@@ -2,7 +2,7 @@ from rest_framework.permissions import BasePermission
 from core.constants import ROLES
 
 class OwnerPermission(BasePermission):
-    allowed_roles = [ROLES]
+    allowed_roles = [ROLES.ORG_OWNER]
 
     def has_permission(self, request, view):
         user_role = str(getattr(request.user, 'role', None))

@@ -125,8 +125,8 @@ class VerifyRegisteredUserAPIView(CustomAPIView):
      def get_extracted_data(self, request):
           data = request.data
           token = data.get('token', None)
-          verification_code = data.get('verification_code', None)     
-          
+          verification_code = data.get('verification_code', None)
+
           return token, verification_code
      
      def post(self, request):

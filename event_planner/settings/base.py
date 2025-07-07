@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     'event_planner',
     'apps.events',
     'apps.users',
+    'apps.organizations',
 ]
 
 MIDDLEWARE = [

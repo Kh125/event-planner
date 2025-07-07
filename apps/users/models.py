@@ -1,7 +1,6 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
 from django.utils import timezone
-from django.utils.text import slugify
 from core.abstract_models import TimeStampModel
 from core.constants import ROLES
 
@@ -76,41 +75,12 @@ class CustomUserManager(BaseUserManager):
 
           return self.create_user(email, password, **extra_fields)
 
-class Organization(models.Model):
-     name = models.CharField(max_length=100, unique=True)
-     slug = models.SlugField(unique=True, blank=True)
-     description = models.TextField(blank=True, null=True)
-     website = models.URLField(blank=True, null=True)
-     logo = models.URLField(max_length=500, null=True, blank=True)
-     contact_email = models.EmailField(blank=True, null=True)
-     phone = models.CharField(max_length=20, blank=True, null=True)
-
-     address = models.CharField(max_length=255, blank=True, null=True)
-     city = models.CharField(max_length=100, blank=True, null=True)
-     country = models.CharField(max_length=100, blank=True, null=True)
-
-     created_by = models.ForeignKey(
-          'CustomUser',
-          on_delete=models.SET_NULL,
-          null=True,
-          blank=True,
-          related_name='created_organizations'
-     )
-
-     def save(self, *args, **kwargs):
-          if not self.slug:
-               self.slug = slugify(self.name)
-          super().save(*args, **kwargs)
-
-     def __str__(self):
-        return self.name
-
 class CustomUser(TimeStampModel, AbstractBaseUser, PermissionsMixin):
      email = models.EmailField(unique=True)
      full_name = models.CharField(max_length=255, blank=True)
      role = models.ForeignKey(Role, on_delete=models.SET_NULL, related_name='users', null= True, blank=True)
      organization = models.ForeignKey(
-          Organization, on_delete=models.SET_NULL,
+          'organizations.Organization', on_delete=models.SET_NULL,
           null=True, blank=True,
           related_name='users'
      )
@@ -128,7 +98,6 @@ class CustomUser(TimeStampModel, AbstractBaseUser, PermissionsMixin):
           return f"{self.email} ({self.role})"
 
 class VerifyRegisteredUser(TimeStampModel):
-
     objects = CustomQuerySet.as_manager()
 
     email = models.CharField(max_length=255)

@@ -1,11 +1,11 @@
 from rest_framework import serializers
-from ..models import Organization
+from apps.organizations.models import Organization
 
 class OrganizationCreateSerializer(serializers.ModelSerializer):
      class Meta:
           model = Organization
           fields = [
-               'name', 'slug', 'description', 'website', 'logo',
+               'name', 'slug', 'organization_type', 'description', 'website', 'logo',
                'contact_email', 'phone', 'address', 'city', 'country'
           ]
           extra_kwargs = {

@@ -20,7 +20,9 @@ class OrganizationResponseService:
                dict: Serialized organization data
           """
           organization = OrganizationService.create_organization(user, **validated_data)
+          
           serializer = OrganizationCreateSerializer(organization)
+          
           return serializer.data
      
      @staticmethod

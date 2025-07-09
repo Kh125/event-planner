@@ -1,22 +1,44 @@
 from rest_framework import status
-from django.shortcuts import get_object_or_404
 from apps.events.models import Event
 from apps.events.serializers.event_analytics_serializer import EventAnalyticsSerializer
-from apps.events.serializers.event_serializer import AttendeeRegistrationSerializer, EventSerializer
-from core.middleware.permission import AllUserPermission
+from apps.events.serializers.event_serializer import AttendeeRegistrationSerializer, EventCreateSerializer
+from services.event.event_service import EventService
+from services.attendee.attendee_service import AttendeeService
 from utils.view.custom_api_views import CustomAPIView
-from rest_framework import status
-from apps.events.models import Event
+from core.middleware.authentication import TokenAuthentication
+from core.middleware.permission import CanCreateEvents, OwnerOrAdminPermission
+from drf_spectacular.utils import extend_schema
+
+@extend_schema(tags=["Events"])
+class CreateEventAPIView(CustomAPIView):
+     authentication_classes = [TokenAuthentication]
+     permission_classes = [CanCreateEvents]
+
+     def post(self, request):
+          serializer = EventCreateSerializer(data=request.data)
+          serializer.is_valid(raise_exception=True)
+          
+          # Use service to create event
+          data = EventService.create_event(
+               user=request.user,
+               validated_data=serializer.validated_data
+          )
+          
+          return self.success_response(
+               message="Event created successfully",
+               data=data,
+               status_code=status.HTTP_201_CREATED
+          )
 
 class EventListAPIView(CustomAPIView):
-     authentication_classes = []
-     permission_classes = []
+     authentication_classes = [TokenAuthentication]
+     permission_classes = [OwnerOrAdminPermission]
      success_message = "Event list fetched successfully"
 
      def get(self, request):
-          queryset = Event.objects.all().order_by('-start_datetime')
-          serializer = EventSerializer(queryset, many=True)
-          return self.success_response(data=serializer.data)
+          events = EventService.get_event_list_for_each_organization(request.user)
+          
+          return self.success_response(data=events)
 
 class EventDetailAPIView(CustomAPIView):
      authentication_classes = []
@@ -25,9 +47,9 @@ class EventDetailAPIView(CustomAPIView):
      error_message = "Event not found"
 
      def get(self, request, event_id):
-          event = get_object_or_404(Event, id=event_id)
-          serializer = EventSerializer(event)
-          return self.success_response(data=serializer.data)
+          event = EventService.get_event_details_by_id(event_id)
+          
+          return self.success_response(data=event)
 
 
 class RegisterAttendeeAPIView(CustomAPIView):
@@ -37,16 +59,20 @@ class RegisterAttendeeAPIView(CustomAPIView):
      error_message = "Registration failed"
 
      def post(self, request, event_id):
-          try:
-               event = Event.objects.get(id=event_id)
-          except Event.DoesNotExist:
-               return self.error_response(message="Event not found", status_code=status.HTTP_404_NOT_FOUND)
-
           serializer = AttendeeRegistrationSerializer(data=request.data)
-          if serializer.is_valid():
-               serializer.save(event=event)
-               return self.success_response(data=serializer.data, status_code=status.HTTP_201_CREATED)
-          return self.error_response(errors=serializer.errors)
+          
+          serializer.is_valid(raise_exception=True)
+          
+          # Use service to register attendee
+          data = AttendeeService.register_attendee_for_event(
+               event_id=event_id,
+               attendee_data=serializer.validated_data
+          )
+          
+          return self.success_response(
+               data=data, 
+               status_code=status.HTTP_201_CREATED
+          )
 
 
 class EventAnalyticsAPIView(CustomAPIView):

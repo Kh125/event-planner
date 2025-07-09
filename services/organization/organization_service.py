@@ -34,11 +34,7 @@ class OrganizationService:
                 created_by=user,
                 **validated_data
             )
-            
-            # Set the user's organization (if needed)
-            if not user.organization:
-                user.organization = organization
-                user.save(update_fields=['organization'])
+            # Note: user.organization is automatically set via post_save signal
             
             return organization
     

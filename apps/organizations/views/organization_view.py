@@ -32,6 +32,6 @@ class OrganizationInfoAPIView(CustomAPIView):
      success_message = "Organization information fetched successfully"
 
      def get(self, request):
-          # Use response service to get organization and serialized data
+          # Get organization data response
           data = OrganizationResponseService.get_user_organization_response(request.user)
           return self.success_response(data=data)

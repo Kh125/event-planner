@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.utils import timezone
-from ..models import Event, Speaker, Session, Attendee
+from ..models import Event, Speaker, Session, Attendee, AttendeeStatus
 
 class SpeakerSerializer(serializers.ModelSerializer):
      class Meta:
@@ -96,17 +96,10 @@ class EventSerializer(serializers.ModelSerializer):
                'speakers', 'sessions', 'created_at', 'updated_at'
           ]
 
-class AttendeeSerializer(serializers.ModelSerializer):
-     class Meta:
-          model = Attendee
-          fields = ['id', 'event', 'full_name', 'email', 'status', 'registered_at']
-          read_only_fields = ['status', 'registered_at']
-
 class AttendeeRegistrationSerializer(serializers.ModelSerializer):
      class Meta:
           model = Attendee
-          fields = ['id', 'full_name', 'email', 'status', 'registered_at']
-          read_only_fields = ['id', 'status', 'registered_at']
+          fields = ['full_name', 'email', 'phone']
 
      def validate_email(self, value):
           """Validate email format and basic checks"""
@@ -119,6 +112,29 @@ class AttendeeRegistrationSerializer(serializers.ModelSerializer):
           if not value or len(value.strip()) < 2:
                raise serializers.ValidationError("Full name must be at least 2 characters long.")
           return value.strip()
+
+     def validate_phone(self, value):
+          """Validate phone number if provided"""
+          if value and len(value.strip()) < 10:
+               raise serializers.ValidationError("Please provide a valid phone number.")
+          return value.strip() if value else value
+
+class AttendeeSerializer(serializers.ModelSerializer):
+     class Meta:
+          model = Attendee
+          fields = ['id', 'full_name', 'email', 'phone', 'status', 'registered_at', 'confirmed_at']
+          read_only_fields = ['id', 'registered_at', 'confirmed_at']
+
+class AttendeeStatusUpdateSerializer(serializers.ModelSerializer):
+     class Meta:
+          model = Attendee
+          fields = ['status']
+          
+     def validate_status(self, value):
+          """Validate status transition"""
+          if value not in [choice[0] for choice in AttendeeStatus.choices]:
+               raise serializers.ValidationError("Invalid status.")
+          return value
 
 class SpeakerCreateSerializer(serializers.ModelSerializer):
      class Meta:

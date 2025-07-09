@@ -3,8 +3,7 @@ from apps.events.views.event_view import (
     CreateEventAPIView, 
     EventAnalyticsAPIView, 
     EventDetailAPIView, 
-    EventListAPIView, 
-    RegisterAttendeeAPIView
+    EventListAPIView
 )
 from apps.events.views.speaker_view import (
     CreateSpeakerAPIView,
@@ -16,6 +15,14 @@ from apps.events.views.session_view import (
     SessionListAPIView,
     SessionDetailAPIView
 )
+from apps.events.views.attendee_view import (
+    AttendeeRegistrationAPIView,
+    AttendeeListAPIView,
+    AttendeeManagementAPIView,
+    AttendeeStatsAPIView,
+    AttendeeRegistrationLookupAPIView,
+    AttendeeCancelRegistrationAPIView
+)
 
 urlpatterns = [
      # Event endpoints
@@ -25,7 +32,12 @@ urlpatterns = [
      path('<int:event_id>/analytics/', EventAnalyticsAPIView.as_view(), name='event-analytics'),
      
      # Attendee endpoints
-     path('<int:event_id>/register/', RegisterAttendeeAPIView.as_view(), name='event-register'),
+     path('<int:event_id>/register/', AttendeeRegistrationAPIView.as_view(), name='attendee-register'),
+     path('<int:event_id>/attendees/', AttendeeListAPIView.as_view(), name='attendee-list'),
+     path('<int:event_id>/attendees/<int:attendee_id>/', AttendeeManagementAPIView.as_view(), name='attendee-management'),
+     path('<int:event_id>/attendees/stats/', AttendeeStatsAPIView.as_view(), name='attendee-stats'),
+     path('<int:event_id>/registration-lookup/', AttendeeRegistrationLookupAPIView.as_view(), name='registration-lookup'),
+     path('<int:event_id>/cancel-registration/', AttendeeCancelRegistrationAPIView.as_view(), name='cancel-registration'),
      
      # Speaker endpoints
      path('<int:event_id>/speakers/', CreateSpeakerAPIView.as_view(), name='speaker-create'),

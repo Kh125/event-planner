@@ -29,7 +29,7 @@ class CustomAPIView(APIView):
           return Response(
                CustomResponse.error(
                     message or self.error_message,
-                    errors=errors
+                    data=errors
                ),
                status=status_code
           )

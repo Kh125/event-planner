@@ -1,7 +1,7 @@
 from django.db import transaction
 from rest_framework.exceptions import ValidationError, NotFound
-from apps.events.models import Event, Attendee
-from apps.events.serializers.event_serializer import AttendeeRegistrationSerializer
+from apps.events.models import Event, Attendee, AttendeeStatus
+from apps.events.serializers.event_serializer import AttendeeRegistrationSerializer, AttendeeSerializer, AttendeeStatusUpdateSerializer
 
 
 class AttendeeService:
@@ -10,44 +10,40 @@ class AttendeeService:
      """
      
      @staticmethod
-     def register_attendee_for_event(event_id: int, attendee_data: dict) -> dict:
+     def register_attendee(event: Event, validated_data: dict) -> dict:
           """
-          Register an attendee for an event
+          Register a new attendee for an event (guest registration)
           
           Args:
-               event_id: The ID of the event to register for
-               attendee_data: Validated attendee registration data
+               event: The event object (passed from view)
+               validated_data: Validated attendee data
                
           Returns:
                dict: Serialized attendee data
                
           Raises:
-               NotFound: If event doesn't exist
-               ValidationError: If registration fails due to business rules
+               ValidationError: If registration fails
           """
-          # Get the event
-          try:
-               event = Event.objects.get(id=event_id)
-          except Event.DoesNotExist:
-               raise NotFound("Event not found")
-          
           # Business rule validations
-          AttendeeService._validate_event_registration_rules(event, attendee_data.get('email'))
-          
-          # Determine attendee status based on capacity
-          status = AttendeeService._determine_attendee_status(event)
+          AttendeeService._validate_attendee_registration_rules(event, validated_data)
           
           with transaction.atomic():
-               # Create attendee registration
+               # Check if already registered
+               existing_attendee = event.attendees.filter(email=validated_data['email']).first()
+               if existing_attendee:
+                    raise ValidationError("This email is already registered for this event")
+               
+               # Create attendee
                attendee = Attendee.objects.create(
                     event=event,
-                    full_name=attendee_data['full_name'],
-                    email=attendee_data['email'],
-                    status=status
+                    **validated_data
                )
                
+               # TODO: Send confirmation email
+               
                # Serialize and return the data
-               serializer = AttendeeRegistrationSerializer(attendee)
+               serializer = AttendeeSerializer(attendee)
+               return serializer.data
                
                return serializer.data
      
@@ -129,7 +125,7 @@ class AttendeeService:
                event_id: The ID of the event
                
           Returns:
-               list: List of attendee data
+               list: List of attendee
                
           Raises:
                NotFound: If event doesn't exist
@@ -139,9 +135,9 @@ class AttendeeService:
           except Event.DoesNotExist:
                raise NotFound("Event not found")
           
-          attendees = event.attendees.all()
+          attendees = event.attendees.all().order_by('-registered_at')
           
-          serializer = AttendeeRegistrationSerializer(attendees, many=True)
+          serializer = AttendeeSerializer(attendees, many=True)
           
           return serializer.data
      
@@ -184,3 +180,132 @@ class AttendeeService:
           serializer = AttendeeRegistrationSerializer(attendee)
           
           return serializer.data
+     
+     @staticmethod
+     def update_attendee_status(event: Event, attendee_id: int, validated_data: dict) -> dict:
+          """
+          Update attendee status (for organizers)
+          
+          Args:
+               event: The event object (passed from view)
+               attendee_id: The ID of the attendee
+               validated_data: Validated status data
+               
+          Returns:
+               dict: Updated attendee data
+               
+          Raises:
+               NotFound: If attendee doesn't exist
+          """
+          try:
+               attendee = event.attendees.get(id=attendee_id)
+          except Attendee.DoesNotExist:
+               raise NotFound("Attendee not found")
+          
+          # Update status
+          attendee.status = validated_data['status']
+          attendee.save()
+          
+          # TODO: Send status update email to attendee
+          
+          serializer = AttendeeSerializer(attendee)
+          return serializer.data
+     
+     @staticmethod
+     def cancel_registration(event: Event, email: str) -> None:
+          """
+          Cancel attendee registration
+          
+          Args:
+               event: The event object
+               email: Email of the attendee to cancel
+               
+          Raises:
+               NotFound: If attendee doesn't exist
+          """
+          try:
+               attendee = event.attendees.get(email=email)
+          except Attendee.DoesNotExist:
+               raise NotFound("Registration not found")
+          
+          attendee.delete()
+          
+          # TODO: Send cancellation confirmation email
+     
+     @staticmethod
+     def get_attendee_by_email(event: Event, email: str) -> dict:
+          """
+          Get attendee details by email
+          
+          Args:
+               event: The event object
+               email: Email of the attendee
+               
+          Returns:
+               dict: Attendee data
+               
+          Raises:
+               NotFound: If attendee doesn't exist
+          """
+          try:
+               attendee = event.attendees.get(email=email)
+          except Attendee.DoesNotExist:
+               raise NotFound("Registration not found")
+          
+          serializer = AttendeeSerializer(attendee)
+          return serializer.data
+     
+     @staticmethod
+     def get_registration_stats(event: Event) -> dict:
+          """
+          Get registration statistics for an event
+          
+          Args:
+               event: The event object
+               
+          Returns:
+               dict: Registration statistics
+          """
+          total_registrations = event.attendees.count()
+          confirmed = event.attendees.filter(status=AttendeeStatus.CONFIRMED).count()
+          pending = event.attendees.filter(status=AttendeeStatus.PENDING).count()
+          rejected = event.attendees.filter(status=AttendeeStatus.REJECTED).count()
+          waitlisted = event.attendees.filter(status=AttendeeStatus.WAITLISTED).count()
+          
+          return {
+               'total_registrations': total_registrations,
+               'confirmed': confirmed,
+               'pending': pending,
+               'rejected': rejected,
+               'waitlisted': waitlisted,
+               'capacity': event.capacity,
+               'available_spots': max(0, event.capacity - confirmed) if event.capacity else None
+          }
+     
+     @staticmethod
+     def _validate_attendee_registration_rules(event: Event, validated_data: dict) -> None:
+          """
+          Validate business rules for attendee registration
+          
+          Args:
+               event: The event to check
+               validated_data: The attendee data to validate
+               
+          Raises:
+               ValidationError: If any business rule is violated
+          """
+          from django.utils import timezone
+          
+          # Check if event registration is still open
+          if event.start_datetime <= timezone.now():
+               raise ValidationError("Registration is closed - event has already started")
+          
+          # Check if event is at capacity (only count confirmed attendees)
+          confirmed_count = event.attendees.filter(status=AttendeeStatus.CONFIRMED).count()
+          if confirmed_count >= event.capacity:
+               raise ValidationError("Event is at full capacity")
+          
+          # Validate email format more strictly if needed
+          email = validated_data.get('email', '')
+          if not email or '@' not in email:
+               raise ValidationError("Please provide a valid email address")

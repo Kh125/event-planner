@@ -87,18 +87,33 @@ class Session(TimeStampModel):
           return f"{self.title} ({self.start_time} - {self.end_time})"
 
 class AttendeeStatus(models.TextChoices):
+     PENDING = 'pending', 'Pending'
      CONFIRMED = 'confirmed', 'Confirmed'
      REJECTED = 'rejected', 'Rejected'
      WAITLISTED = 'waitlisted', 'Waitlisted'
-     PENDING = 'pending', 'Pending'
 
 class Attendee(TimeStampModel):
      event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='attendees')
      email = models.EmailField()
      full_name = models.CharField(max_length=100)
+     phone = models.CharField(max_length=20, blank=True)
      status = models.CharField(max_length=20, choices=AttendeeStatus.choices, default=AttendeeStatus.PENDING)
-
+     
+     # Optional user account (for future linking)
+     user = models.ForeignKey('users.CustomUser', on_delete=models.SET_NULL, null=True, blank=True, related_name='event_registrations')
+     
      registered_at = models.DateTimeField(auto_now_add=True)
+     confirmed_at = models.DateTimeField(null=True, blank=True)
+
+     class Meta:
+          unique_together = ['event', 'email']  # Prevent duplicate registrations
+          
+     def save(self, *args, **kwargs):
+          # Auto-set confirmed_at when status changes to confirmed
+          if self.status == AttendeeStatus.CONFIRMED and not self.confirmed_at:
+               from django.utils import timezone
+               self.confirmed_at = timezone.now()
+          super().save(*args, **kwargs)
 
      def __str__(self):
-          return f"{self.full_name} - {self.status}"
+          return f"{self.full_name} - {self.event.name} ({self.status})"

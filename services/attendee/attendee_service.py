@@ -34,9 +34,13 @@ class AttendeeService:
                if existing_attendee:
                     raise ValidationError("This email is already registered for this event")
                
+               # Determine attendee status based on event registration type
+               attendee_status = AttendeeService._determine_attendee_status(event)
+               
                # Create attendee
                attendee = Attendee.objects.create(
                     event=event,
+                    status=attendee_status,
                     **validated_data
                )
                
@@ -72,20 +76,37 @@ class AttendeeService:
      @staticmethod
      def _determine_attendee_status(event: Event) -> str:
           """
-          Determine the status for a new attendee based on event capacity
+          Determine the status for a new attendee based on event registration type and capacity
           
           Args:
                event: The event to check
                
           Returns:
-               str: The status for the new attendee ('confirmed' or 'waitlisted')
+               str: The status for the new attendee
           """
-          confirmed_count = event.attendees.filter(status='confirmed').count()
+          from apps.events.models import RegistrationType
           
-          if confirmed_count >= event.capacity:
-               return 'waitlisted'
-          else:
-               return 'confirmed'
+          confirmed_count = event.attendees.filter(status=AttendeeStatus.CONFIRMED).count()
+          
+          # Check registration type and approval requirements
+          if event.registration_type == RegistrationType.APPROVAL_REQUIRED or event.requires_approval:
+               # All registrations need manual approval
+               return AttendeeStatus.PENDING
+          
+          elif event.registration_type == RegistrationType.OPEN:
+               # Auto-confirm if space available, otherwise waitlist
+               if confirmed_count >= event.capacity:
+                    return AttendeeStatus.WAITLISTED
+               else:
+                    return AttendeeStatus.CONFIRMED
+          
+          elif event.registration_type == RegistrationType.INVITATION_ONLY:
+               # This shouldn't happen in normal flow since invitation-only events
+               # should not allow public registration, but if it does, require approval
+               return AttendeeStatus.PENDING
+          
+          # Default fallback
+          return AttendeeStatus.PENDING
      
      @staticmethod
      def _is_event_at_capacity(event: Event) -> bool:
@@ -311,6 +332,7 @@ class AttendeeService:
           # Check if registration is open (time-based)
           if not event.is_registration_open:
                now = timezone.now()
+               
                if event.registration_opens and now < event.registration_opens:
                     raise ValidationError(f"Registration opens on {event.registration_opens}")
                elif event.registration_closes and now > event.registration_closes:

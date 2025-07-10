@@ -30,6 +30,7 @@ class AttendeeService:
           with transaction.atomic():
                # Check if already registered
                existing_attendee = event.attendees.filter(email=validated_data['email']).first()
+               
                if existing_attendee:
                     raise ValidationError("This email is already registered for this event")
                
@@ -43,7 +44,6 @@ class AttendeeService:
                
                # Serialize and return the data
                serializer = AttendeeSerializer(attendee)
-               return serializer.data
                
                return serializer.data
      
@@ -295,17 +295,41 @@ class AttendeeService:
                ValidationError: If any business rule is violated
           """
           from django.utils import timezone
+          from apps.events.models import EventStatus, RegistrationType
           
-          # Check if event registration is still open
-          if event.start_datetime <= timezone.now():
-               raise ValidationError("Registration is closed - event has already started")
+          # Check if event is published and public
+          if event.status != EventStatus.PUBLISHED:
+               raise ValidationError("Event is not available for registration")
+               
+          if not event.is_public:
+               raise ValidationError("This is a private event")
+          
+          # Check registration type
+          if event.registration_type == RegistrationType.INVITATION_ONLY:
+               raise ValidationError("This event is invitation only")
+          
+          # Check if registration is open (time-based)
+          if not event.is_registration_open:
+               now = timezone.now()
+               if event.registration_opens and now < event.registration_opens:
+                    raise ValidationError(f"Registration opens on {event.registration_opens}")
+               elif event.registration_closes and now > event.registration_closes:
+                    raise ValidationError("Registration has closed")
+               elif event.start_datetime <= now:
+                    raise ValidationError("Registration is closed - event has already started")
+               else:
+                    raise ValidationError("Registration is not currently open")
           
           # Check if event is at capacity (only count confirmed attendees)
-          confirmed_count = event.attendees.filter(status=AttendeeStatus.CONFIRMED).count()
-          if confirmed_count >= event.capacity:
-               raise ValidationError("Event is at full capacity")
+          if event.is_full:
+               if event.registration_type == RegistrationType.APPROVAL_REQUIRED:
+                    # Allow registration but will be pending approval
+                    pass
+               else:
+                    raise ValidationError("Event is at full capacity")
           
-          # Validate email format more strictly if needed
+          # Validate email format
           email = validated_data.get('email', '')
+          
           if not email or '@' not in email:
                raise ValidationError("Please provide a valid email address")

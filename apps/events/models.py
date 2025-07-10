@@ -3,6 +3,18 @@ from django.utils.text import slugify
 from timezone_field import TimeZoneField
 from core.abstract_models import TimeStampModel
 
+class EventStatus(models.TextChoices):
+     DRAFT = 'draft', 'Draft'
+     PUBLISHED = 'published', 'Published'
+     ONGOING = 'ongoing', 'Ongoing'
+     COMPLETED = 'completed', 'Completed'
+     CANCELLED = 'cancelled', 'Cancelled'
+
+class RegistrationType(models.TextChoices):
+     OPEN = 'open', 'Open Registration'
+     INVITATION_ONLY = 'invitation_only', 'Invitation Only'
+     APPROVAL_REQUIRED = 'approval_required', 'Approval Required'
+
 class Event(TimeStampModel):
      name = models.CharField(max_length=255)
      slug = models.SlugField(unique=True, blank=True)
@@ -18,6 +30,14 @@ class Event(TimeStampModel):
      venue_address = models.TextField()
 
      timezone = TimeZoneField(default='UTC')
+     
+     # Event visibility and registration settings
+     status = models.CharField(max_length=20, choices=EventStatus.choices, default=EventStatus.DRAFT)
+     is_public = models.BooleanField(default=False, help_text="Whether event appears in public listings")
+     registration_type = models.CharField(max_length=20, choices=RegistrationType.choices, default=RegistrationType.OPEN)
+     registration_opens = models.DateTimeField(null=True, blank=True, help_text="When registration opens (optional)")
+     registration_closes = models.DateTimeField(null=True, blank=True, help_text="When registration closes (optional)")
+     requires_approval = models.BooleanField(default=False, help_text="Whether registrations need manual approval")
 
      # Organizer
      created_by = models.ForeignKey(
@@ -52,6 +72,46 @@ class Event(TimeStampModel):
      def total_duration_hours(self):
           """Returns total duration in hours"""
           return float(self.duration_hours) + (self.duration_days * 24)
+
+     @property
+     def is_registration_open(self):
+          """Check if registration is currently open"""
+          from django.utils import timezone
+          now = timezone.now()
+          
+          # Check if event has started
+          if self.start_datetime <= now:
+               return False
+               
+          # Check registration window
+          if self.registration_opens and now < self.registration_opens:
+               return False
+               
+          if self.registration_closes and now > self.registration_closes:
+               return False
+               
+          return True
+
+     @property
+     def available_spots(self):
+          """Get number of available spots"""
+          confirmed_count = self.attendees.filter(status='confirmed').count()
+          return max(0, self.capacity - confirmed_count)
+
+     @property
+     def is_full(self):
+          """Check if event is at capacity"""
+          return self.available_spots == 0
+
+     def can_register(self):
+          """Check if new registrations are allowed"""
+          return (
+               self.status == EventStatus.PUBLISHED and
+               self.is_public and
+               self.registration_type == RegistrationType.OPEN and
+               self.is_registration_open and
+               not self.is_full
+          )
 
      def __str__(self):
           return self.name

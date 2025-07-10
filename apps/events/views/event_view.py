@@ -1,7 +1,7 @@
 from rest_framework import status
 from apps.events.models import Event
 from apps.events.serializers.event_analytics_serializer import EventAnalyticsSerializer
-from apps.events.serializers.event_serializer import AttendeeRegistrationSerializer, EventCreateSerializer
+from apps.events.serializers.event_serializer import AttendeeRegistrationSerializer, EventCreateSerializer, EventUpdateSerializer
 from services.event.event_service import EventService
 from services.attendee.attendee_service import AttendeeService
 from utils.view.custom_api_views import CustomAPIView
@@ -88,4 +88,88 @@ class EventAnalyticsAPIView(CustomAPIView):
                return self.error_response(message="Event not found", status_code=status.HTTP_404_NOT_FOUND)
 
           serializer = EventAnalyticsSerializer(event)
+          
           return self.success_response(data=serializer.data)
+
+@extend_schema(tags=["Events"])
+class EventUpdateStatusAPIView(CustomAPIView):
+     """Event status management (organizers only)"""
+     authentication_classes = [TokenAuthentication]
+     permission_classes = [OwnerOrAdminPermission]
+
+     def patch(self, request, event_id):
+          """Update event status and visibility"""
+          from apps.events.serializers.event_serializer import EventStatusSerializer
+          from django.shortcuts import get_object_or_404
+          
+          # Get event and check ownership
+          event = get_object_or_404(Event, id=event_id)
+          
+          if event.created_by.organization != request.user.organization:
+               return self.error_response(
+                    message="You don't have permission to modify this event",
+                    status_code=status.HTTP_403_FORBIDDEN
+               )
+          
+          serializer = EventStatusSerializer(event, data=request.data, partial=True)
+          serializer.is_valid(raise_exception=True)
+          serializer.save()
+          
+          return self.success_response(
+               message="Event status updated successfully",
+               data=serializer.data
+          )
+
+@extend_schema(tags=["Events"])
+class EventManageAPIView(CustomAPIView):
+     """Event update management (organizers only)"""
+     authentication_classes = [TokenAuthentication]
+     permission_classes = [OwnerOrAdminPermission]
+
+     def put(self, request, event_id):
+          """Update event details"""
+          from django.shortcuts import get_object_or_404
+          
+          # Get event and check ownership
+          event = get_object_or_404(Event, id=event_id)
+          
+          if event.created_by.organization != request.user.organization:
+               return self.error_response(
+                    message="You don't have permission to modify this event",
+                    status_code=status.HTTP_403_FORBIDDEN
+               )
+
+          # Todo: TO fix EventUpdateSerializer
+          serializer = EventUpdateSerializer(event, data=request.data, partial=True)
+          serializer.is_valid(raise_exception=True)
+          serializer.save()
+          
+          return self.success_response(
+               message="Event updated successfully",
+               data=serializer.data
+          )
+
+     def delete(self, request, event_id):
+          """Cancel/Delete event"""
+          from django.shortcuts import get_object_or_404
+          from apps.events.models import EventStatus
+          
+          # Get event and check ownership
+          event = get_object_or_404(Event, id=event_id)
+          
+          if event.created_by.organization != request.user.organization:
+               return self.error_response(
+                    message="You don't have permission to modify this event",
+                    status_code=status.HTTP_403_FORBIDDEN
+               )
+          
+          # Instead of deleting, mark as cancelled
+          event.status = EventStatus.CANCELLED
+          event.is_public = False
+          event.save()
+          
+          # TODO: Send cancellation emails to attendees
+          
+          return self.success_response(
+               message="Event cancelled successfully"
+          )

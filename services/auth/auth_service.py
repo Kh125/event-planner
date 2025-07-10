@@ -149,7 +149,7 @@ class AuthenticationService:
      
      @staticmethod
      def generate_auth_tokens(user):
-          access_token = TokenUtil.generate_access_token(user.pk, user.role.name, 30)
+          access_token = TokenUtil.generate_access_token(user.pk, user.role.name, 300)
           refresh_token = TokenUtil.generate_refresh_token(user.pk, user.role.name)
           
           return {

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.utils import timezone
-from ..models import Event, Speaker, Session, Attendee, AttendeeStatus
+from ..models import Event, Speaker, Session, Attendee, AttendeeStatus, EventStatus, RegistrationType
 
 class SpeakerSerializer(serializers.ModelSerializer):
      class Meta:
@@ -19,13 +19,17 @@ class EventCreateSerializer(serializers.ModelSerializer):
           model = Event
           fields = [
                'id', 'name', 'slug', 'description', 'start_datetime', 'end_datetime', 
-               'duration_days', 'duration_hours', 'capacity', 'venue_name', 'venue_address', 
+               'duration_days', 'duration_hours', 'capacity', 'venue_name', 'venue_address',
+               'status', 'is_public', 'registration_type', 'registration_opens', 'registration_closes', 'requires_approval',
                'created_at', 'updated_at'
           ]
           extra_kwargs = {
                'id': {'read_only': True},
                'slug': {'required': False},
                'end_datetime': {'required': False},
+               'status': {'required': False},  # Defaults to DRAFT
+               'registration_opens': {'required': False},
+               'registration_closes': {'required': False},
                'created_at': {'read_only': True},
                'updated_at': {'read_only': True}
           }
@@ -83,9 +87,56 @@ class EventCreateSerializer(serializers.ModelSerializer):
           
           return attrs
 
+class EventUpdateSerializer(serializers.ModelSerializer):
+     class Meta:
+          model = Event
+          fields = [
+               'id', 'name', 'slug', 'description', 'start_datetime', 'end_datetime', 
+               'duration_days', 'duration_hours', 'capacity', 'venue_name', 'venue_address',
+               'status', 'is_public', 'registration_type', 'registration_opens', 'registration_closes', 'requires_approval',
+               'created_at', 'updated_at'
+          ]
+          extra_kwargs = {
+               'id': {'read_only': True},
+               'slug': {'required': False},
+               'end_datetime': {'required': False},
+               'status': {'required': False},  # Defaults to DRAFT
+               'registration_opens': {'required': False},
+               'registration_closes': {'required': False},
+               'created_at': {'read_only': True},
+               'updated_at': {'read_only': True}
+          }
+
+     def validate_name(self, value):
+          """Validate event name"""
+          if not value or len(value.strip()) < 3:
+               raise serializers.ValidationError("Event name must be at least 3 characters long.")
+          return value.strip()
+
+     def validate_description(self, value):
+          """Validate event description"""
+          if not value or len(value.strip()) < 10:
+               raise serializers.ValidationError("Event description must be at least 10 characters long.")
+          return value.strip()
+
+     def validate_venue_name(self, value):
+          """Validate venue name"""
+          if not value or len(value.strip()) < 2:
+               raise serializers.ValidationError("Venue name must be at least 2 characters long.")
+          return value.strip()
+
+     def validate_venue_address(self, value):
+          """Validate venue address"""
+          if not value or len(value.strip()) < 5:
+               raise serializers.ValidationError("Venue address must be at least 5 characters long.")
+          return value.strip()
+
 class EventSerializer(serializers.ModelSerializer):
      speakers = SpeakerSerializer(many=True, read_only=True)
      sessions = SessionSerializer(many=True, read_only=True)
+     is_registration_open = serializers.ReadOnlyField()
+     available_spots = serializers.ReadOnlyField()
+     can_register = serializers.ReadOnlyField()
 
      class Meta:
           model = Event
@@ -93,8 +144,37 @@ class EventSerializer(serializers.ModelSerializer):
                'id', 'name', 'slug', 'description',
                'start_datetime', 'end_datetime', 'duration_days', 'duration_hours', 'capacity',
                'venue_name', 'venue_address',
+               'status', 'is_public', 'registration_type', 'registration_opens', 'registration_closes', 'requires_approval',
+               'is_registration_open', 'available_spots', 'can_register',
                'speakers', 'sessions', 'created_at', 'updated_at'
           ]
+
+# Create a public event serializer (limited fields for public discovery)
+class PublicEventSerializer(serializers.ModelSerializer):
+     is_registration_open = serializers.ReadOnlyField()
+     available_spots = serializers.ReadOnlyField()
+     can_register = serializers.ReadOnlyField()
+
+     class Meta:
+          model = Event
+          fields = [
+               'id', 'name', 'slug', 'description',
+               'start_datetime', 'end_datetime', 'capacity',
+               'venue_name', 'venue_address',
+               'registration_type', 'registration_opens', 'registration_closes',
+               'is_registration_open', 'available_spots', 'can_register'
+          ]
+
+# Event status update serializer
+class EventStatusSerializer(serializers.ModelSerializer):
+     class Meta:
+          model = Event
+          fields = ['status', 'is_public']
+          
+     def validate_status(self, value):
+          if value not in [choice[0] for choice in EventStatus.choices]:
+               raise serializers.ValidationError("Invalid status.")
+          return value
 
 class AttendeeRegistrationSerializer(serializers.ModelSerializer):
      class Meta:

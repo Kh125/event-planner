@@ -95,6 +95,38 @@ class InvitationService:
           invitation.delete()
      
      @staticmethod
+     def verify_invitation_token(token: str) -> dict:
+          """
+          Verify an invitation token and return invitation details
+          
+          Args:
+               token: The invitation token
+               
+          Returns:
+               dict: Invitation details for registration form
+          """
+          try:
+               invitation = OrganizationInvitation.objects.select_related(
+                    'organization', 'role'
+               ).get(token=token)
+          except OrganizationInvitation.DoesNotExist:
+               raise NotFound("Invalid invitation token")
+          
+          if not invitation.is_valid():
+               if invitation.accepted:
+                    raise ValidationError("This invitation has already been accepted")
+               elif invitation.is_expired():
+                    raise ValidationError("This invitation has expired")
+          
+          return {
+               'email': invitation.email,
+               'organization_name': invitation.organization.name,
+               'role_name': invitation.role.name,
+               'invited_by': invitation.invited_by.full_name,
+               'expires_at': invitation.expires_at
+          }
+     
+     @staticmethod
      def accept_invitation(validated_data: dict) -> dict:
           """
           Accept an invitation and create user account

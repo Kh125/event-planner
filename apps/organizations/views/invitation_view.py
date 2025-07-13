@@ -102,6 +102,33 @@ class InvitationManagementAPIView(CustomAPIView):
           
           return self.success_response("Invitation resent successfully", data)
 
+
+@extend_schema(tags=["Public Invitations"])
+class InvitationVerifyAPIView(CustomAPIView):
+     permission_classes = []
+     
+     @extend_schema(
+          summary="Verify invitation token",
+          responses={200: {
+               "type": "object",
+               "properties": {
+                    "email": {"type": "string"},
+                    "organization_name": {"type": "string"},
+                    "role_name": {"type": "string"},
+                    "invited_by": {"type": "string"},
+                    "expires_at": {"type": "string", "format": "date-time"}
+               }
+          }}
+     )
+     def get(self, request, token):
+          """Verify invitation token and get details for registration"""
+          data = InvitationService.verify_invitation_token(token)
+          
+          return self.success_response(
+               "Invitation verified successfully",
+               data
+          )
+
 @extend_schema(tags=["Public Invitations"])
 class AcceptInvitationAPIView(CustomAPIView):
      permission_classes = []  # Public endpoint

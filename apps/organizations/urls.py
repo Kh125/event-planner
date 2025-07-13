@@ -1,5 +1,5 @@
 from django.urls import path
-from apps.organizations.views.invitation_view import AcceptInvitationAPIView, InvitationManagementAPIView, OrganizationInvitationAPIView
+from apps.organizations.views.invitation_view import AcceptInvitationAPIView, InvitationManagementAPIView, InvitationVerifyAPIView, OrganizationInvitationAPIView
 from apps.organizations.views.organization_view import CreateOrganizationView, OrganizationInfoAPIView
 
 urlpatterns = [
@@ -11,5 +11,6 @@ urlpatterns = [
     path('<int:org_id>/invitations/<int:invitation_id>/', InvitationManagementAPIView.as_view(), name='invitation-management'),
     
     # Public invitation endpoints
+    path('invitations/verify/<str:token>/', InvitationVerifyAPIView.as_view(), name='verify-invitation'),
     path('invitations/accept/', AcceptInvitationAPIView.as_view(), name='accept-invitation'),
 ]

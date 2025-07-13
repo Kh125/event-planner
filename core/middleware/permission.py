@@ -2,6 +2,7 @@ from rest_framework.permissions import BasePermission
 from rest_framework.permissions import BasePermission
 from rest_framework.exceptions import NotFound
 from apps.events.models import Event
+from apps.users.models import CustomUser
 from core.constants import ROLES
 
 class OwnerPermission(BasePermission):
@@ -58,6 +59,25 @@ class AllUserPermission(BasePermission):
             return True
         
         return False
+
+
+class IsOrganizationOwner(BasePermission):
+    """
+    Permission to check if user is the owner of organization
+    """
+    
+    def has_permission(self, request, view):
+        user_role = str(getattr(request.user, 'role', None))
+
+        if user_role in self.allowed_roles:
+            return True
+        
+        return False
+
+    def has_object_permission(self, request, view, obj):
+        user: CustomUser = request.user
+        
+        return user.role and user.role.name == ROLES.ORG_OWNER and obj.created_by == user
 
 class IsEventCreatorOrOrgAdmin(BasePermission):
     """

@@ -1,23 +1,26 @@
 from rest_framework import serializers
 from apps.organizations.models import OrganizationInvitation
-from apps.users.models import Role
 
 class SendInvitationSerializer(serializers.ModelSerializer):
      email = serializers.EmailField()
      message = serializers.CharField(max_length=255, required=False, allow_blank=True)
 
+     class Meta:
+          model = OrganizationInvitation
+          fields = ['email', 'message']
+
      def validate(self, attrs):
           return attrs
 
 class InvitationSerializer(serializers.ModelSerializer):
-     invited_by_name = serializers.CharField(source='invited_by.full_name')
-     accepted_by_name = serializers.CharField(source='accepted_by.full_name')
+     invited_by_name = serializers.CharField(source='invited_by.full_name', read_only=True)
+     accepted_by_name = serializers.CharField(source='accepted_by.full_name', read_only=True, allow_null=True)
      
      class Meta:
-          models= OrganizationInvitation
+          model = OrganizationInvitation
           fields = [
                'id', 'email', 'invited_by_name', 'token',
-               'is_invitation_accepted', 'is_registration_approved',
+               'is_invitation_accepted',
                'expired_at', 'accepted_at', 'accepted_by_name'
           ]
 

@@ -13,9 +13,9 @@ from utils.view.custom_api_views import CustomAPIView
 class OrganizationInvitationAPIView(CustomAPIView):
      permission_classes = [IsOrganizationOwner]
      
-     def get_organization(self, org_id):
+     def get_organization(self, request):
           try:
-               return Organization.objects.get(id=org_id)
+               return request.user.organization
           except Organization.DoesNotExist:
                raise NotFound("Organization not found")
      
@@ -24,9 +24,9 @@ class OrganizationInvitationAPIView(CustomAPIView):
           request=SendInvitationSerializer,
           responses={201: InvitationSerializer}
      )
-     def post(self, request, org_id):
+     def post(self, request):
           """Send invitation to user to join organization"""
-          organization = self.get_organization(org_id)
+          organization = self.get_organization(request)
           
           # Check permission
           self.check_object_permissions(request, organization)
@@ -39,8 +39,8 @@ class OrganizationInvitationAPIView(CustomAPIView):
           )
           
           return self.success_response(
-               "Invitation sent successfully",
-               data,
+               message="Invitation sent successfully",
+               data=data,
                status_code=201
           )
      
@@ -48,9 +48,9 @@ class OrganizationInvitationAPIView(CustomAPIView):
           summary="List organization invitations",
           responses={200: InvitationSerializer(many=True)}
      )
-     def get(self, request, org_id):
+     def get(self, request):
           """Get all invitations for organization"""
-          organization = self.get_organization(org_id)
+          organization = self.get_organization(request)
           
           # Check permission
           self.check_object_permissions(request, organization)
@@ -66,9 +66,9 @@ class OrganizationInvitationAPIView(CustomAPIView):
 class InvitationManagementAPIView(CustomAPIView):
      permission_classes = [IsOrganizationOwner]
      
-     def get_organization(self, org_id):
+     def get_organization(self, request):
           try:
-               return Organization.objects.get(id=org_id)
+               return request.user.organization
           except Organization.DoesNotExist:
                raise NotFound("Organization not found")
      
@@ -76,9 +76,9 @@ class InvitationManagementAPIView(CustomAPIView):
           summary="Cancel invitation",
           responses={200: {"type": "object", "properties": {"message": {"type": "string"}}}}
      )
-     def delete(self, request, org_id, invitation_id):
+     def delete(self, request, invitation_id):
           """Cancel a pending invitation"""
-          organization = self.get_organization(org_id)
+          organization = self.get_organization(request)
           
           # Check permission
           self.check_object_permissions(request, organization)
@@ -91,9 +91,9 @@ class InvitationManagementAPIView(CustomAPIView):
           summary="Resend invitation",
           responses={200: InvitationSerializer}
      )
-     def post(self, request, org_id, invitation_id):
+     def post(self, request, invitation_id):
           """Resend invitation email"""
-          organization = self.get_organization(org_id)
+          organization = self.get_organization(request)
           
           # Check permission
           self.check_object_permissions(request, organization)
@@ -125,8 +125,8 @@ class InvitationVerifyAPIView(CustomAPIView):
           data = InvitationService.verify_invitation_token(token)
           
           return self.success_response(
-               "Invitation verified successfully",
-               data
+               message="Invitation verified successfully",
+               data=data
           )
 
 @extend_schema(tags=["Public Invitations"])
@@ -155,7 +155,7 @@ class AcceptInvitationAPIView(CustomAPIView):
           data = InvitationService.accept_invitation(serializer.validated_data)
           
           return self.success_response(
-               "Account created successfully! Welcome to the organization.",
-               data,
+               message="Account created successfully! Welcome to the organization.",
+               data=data,
                status_code=201
           )

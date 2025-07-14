@@ -65,6 +65,7 @@ class IsOrganizationOwner(BasePermission):
     """
     Permission to check if user is the owner of organization
     """
+    allowed_roles = [ROLES.ORG_OWNER]
     
     def has_permission(self, request, view):
         user_role = str(getattr(request.user, 'role', None))

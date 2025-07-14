@@ -38,7 +38,7 @@ class InvitationService:
                raise ValidationError("A pending invitation already exists for this email")
 
           with transaction.atomic():
-               organization.invitations.filter(email=email, accepted=False).delete()
+               organization.invitations.filter(email=email, is_invitation_accepted=False).delete()
                
                invitation = OrganizationInvitation.objects.create(
                     organization=organization,
@@ -107,7 +107,7 @@ class InvitationService:
           """
           try:
                invitation = OrganizationInvitation.objects.select_related(
-                    'organization', 'role'
+                    'organization'
                ).get(token=token)
           except OrganizationInvitation.DoesNotExist:
                raise NotFound("Invalid invitation token")
@@ -121,9 +121,8 @@ class InvitationService:
           return {
                'email': invitation.email,
                'organization_name': invitation.organization.name,
-               'role_name': invitation.role.name,
                'invited_by': invitation.invited_by.full_name,
-               'expires_at': invitation.expires_at
+               'expired_at': invitation.expired_at
           }
      
      @staticmethod

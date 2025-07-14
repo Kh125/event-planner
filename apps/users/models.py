@@ -36,7 +36,7 @@ class CustomUserManager(BaseUserManager):
           email = self.normalize_email(email)
           full_name = extra_fields.pop('full_name', '')
           role = extra_fields.pop('role', ROLES.MEMBER)
-          organization = extra_fields.get('organization', None)          
+          organization = extra_fields.pop('organization', None)          
 
           user = self.model(
                email=email,

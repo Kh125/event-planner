@@ -31,6 +31,14 @@ from apps.events.views.public_event_view import (
     PublicEventScheduleAPIView,
     EventSearchAPIView
 )
+from apps.events.views.attendee_invitation_view import (
+    AttendeeInvitationAPIView,
+    AttendeeInvitationManagementAPIView,
+    AttendeeInvitationStatsAPIView,
+    PublicInvitationVerifyAPIView,
+    AcceptAttendeeInvitationAPIView,
+    RejectAttendeeInvitationAPIView
+)
 
 urlpatterns = [
     # Event management endpoints (authenticated)
@@ -64,4 +72,9 @@ urlpatterns = [
     path('<int:event_id>/sessions/', CreateSessionAPIView.as_view(), name='session-create'),
     path('<int:event_id>/sessions/list/', SessionListAPIView.as_view(), name='session-list'),
     path('<int:event_id>/sessions/<int:session_id>/', SessionDetailAPIView.as_view(), name='session-detail'),
+
+    # Attendee invitation endpoints (organizers)
+    path('<int:event_id>/invitations/', AttendeeInvitationAPIView.as_view(), name='attendee-invitations'),
+    path('<int:event_id>/invitations/<int:invitation_id>/', AttendeeInvitationManagementAPIView.as_view(), name='invitation-management'),
+    path('<int:event_id>/invitations/stats/', AttendeeInvitationStatsAPIView.as_view(), name='invitation-stats'),
 ]

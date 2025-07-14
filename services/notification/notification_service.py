@@ -269,6 +269,46 @@ class NotificationService:
                               {{ organization_name }}
                               '''.strip()}},
                
+               NotificationType.ATTENDEE_INVITED: {
+                    NotificationChannel.EMAIL: {
+                         'subject_template': '{% if is_vip %}VIP {% endif %}Invitation: {{ event_name }}',
+                         'body_template': '''
+Dear {{ recipient_name }},
+
+You have been personally invited{% if is_vip %} as a VIP guest{% endif %} to attend {{ event_name }}.
+
+Event Details:
+- Event: {{ event_name }}
+- Date: {{ event_date }}
+- Time: {{ event_time }}
+- Venue: {{ venue_name }}
+- Address: {{ venue_address }}
+
+{% if personal_message %}
+Personal message from {{ inviter_name }}:
+"{{ personal_message }}"
+{% endif %}
+
+{{ event_description }}
+
+To accept this invitation and secure your spot, please click the link below:
+{{ invitation_url }}
+
+{% if is_vip %}
+As a VIP guest, you will receive special treatment and priority access.
+{% endif %}
+
+This invitation expires on {{ expires_at }}.
+
+We hope to see you there!
+
+Best regards,
+{{ inviter_name }}
+{{ organization_name }}
+                         '''.strip()
+                    }
+               },
+               
                # Attendee Confirmation
                NotificationType.ATTENDEE_CONFIRMED: {
                     NotificationChannel.EMAIL: {

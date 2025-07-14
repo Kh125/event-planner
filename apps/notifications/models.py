@@ -17,6 +17,7 @@ class NotificationType(models.TextChoices):
      
      # Attendee notifications
      ATTENDEE_REGISTERED = 'attendee_registered', 'Attendee Registered'
+     ATTENDEE_INVITED = 'attendee_invited', 'Attendee Invited'
      ATTENDEE_CONFIRMED = 'attendee_confirmed', 'Registration Confirmed'
      ATTENDEE_REJECTED = 'attendee_rejected', 'Registration Rejected'
      ATTENDEE_WAITLISTED = 'attendee_waitlisted', 'Added to Waitlist'

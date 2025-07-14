@@ -165,46 +165,6 @@ class AttendeeService:
           return serializer.data
      
      @staticmethod
-     def update_attendee_status(event_id: int, attendee_id: int, status: str) -> dict:
-          """
-          Update attendee status (confirm, reject, waitlist)
-          
-          Args:
-               event_id: The ID of the event
-               attendee_id: The ID of the attendee
-               status: New status for the attendee
-               
-          Returns:
-               dict: Updated attendee data
-               
-          Raises:
-               NotFound: If event or attendee doesn't exist
-               ValidationError: If status is invalid
-          """
-          try:
-               event = Event.objects.get(id=event_id)
-          except Event.DoesNotExist:
-               raise NotFound("Event not found")
-          
-          try:
-               attendee = event.attendees.get(id=attendee_id)
-          except Attendee.DoesNotExist:
-               raise NotFound("Attendee not found")
-          
-          # Validate status
-          valid_statuses = ['confirmed', 'rejected', 'waitlisted', 'pending']
-          
-          if status not in valid_statuses:
-               raise ValidationError(f"Invalid status. Must be one of: {valid_statuses}")
-          
-          attendee.status = status
-          attendee.save(update_fields=['status'])
-          
-          serializer = AttendeeRegistrationSerializer(attendee)
-          
-          return serializer.data
-     
-     @staticmethod
      def update_attendee_status(event: Event, attendee_id: int, validated_data: dict) -> dict:
           """
           Update attendee status (for organizers)

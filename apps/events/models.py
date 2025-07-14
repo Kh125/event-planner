@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.text import slugify
 from timezone_field import TimeZoneField
 from core.abstract_models import TimeStampModel
+import uuid
 
 class EventStatus(models.TextChoices):
      DRAFT = 'draft', 'Draft'
@@ -177,3 +178,80 @@ class Attendee(TimeStampModel):
 
      def __str__(self):
           return f"{self.full_name} - {self.event.name} ({self.status})"
+
+class AttendeeInvitationStatus(models.TextChoices):
+     PENDING = 'pending', 'Pending'
+     ACCEPTED = 'accepted', 'Accepted'
+     REJECTED = 'rejected', 'Rejected'
+     EXPIRED = 'expired', 'Expired'
+     CANCELLED = 'cancelled', 'Cancelled'
+
+
+class AttendeeInvitation(TimeStampModel):
+     """Invitation for specific people to attend an event"""
+     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='invitations')
+     email = models.EmailField()
+     full_name = models.CharField(max_length=100, blank=True)
+     
+     # Invitation details
+     invited_by = models.ForeignKey(
+          'users.CustomUser',
+          on_delete=models.SET_NULL,
+          null=True,
+          related_name='sent_attendee_invitations'
+     )
+     token = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+     message = models.TextField(blank=True, help_text="Personal message from the inviter")
+     
+     # Status and tracking
+     status = models.CharField(max_length=20, choices=AttendeeInvitationStatus.choices, default=AttendeeInvitationStatus.PENDING)
+     expires_at = models.DateTimeField()
+     
+     # Response tracking
+     responded_at = models.DateTimeField(null=True, blank=True)
+     attendee = models.OneToOneField(
+          Attendee, 
+          on_delete=models.SET_NULL, 
+          null=True, 
+          blank=True,
+          related_name='invitation'
+     )
+     
+     # Special invitation properties
+     is_vip = models.BooleanField(default=False, help_text="VIP invitation with special privileges")
+     bypass_capacity = models.BooleanField(default=False, help_text="Allow registration even if event is full")
+     
+     class Meta:
+          unique_together = ['event', 'email']  # One invitation per email per event
+          indexes = [
+               models.Index(fields=['token']),
+               models.Index(fields=['event', 'status']),
+               models.Index(fields=['email', 'status']),
+          ]
+     
+     def save(self, *args, **kwargs):
+          if not self.expires_at:
+               from django.utils import timezone
+               from datetime import timedelta
+               # Default expiration: 7 days from creation
+               self.expires_at = timezone.now() + timedelta(days=7)
+          super().save(*args, **kwargs)
+     
+     def is_expired(self) -> bool:
+          """Check if invitation has expired"""
+          from django.utils import timezone
+          return timezone.now() > self.expires_at
+     
+     def is_valid(self) -> bool:
+          """Check if invitation is valid (pending and not expired)"""
+          return (
+               self.status == AttendeeInvitationStatus.PENDING and 
+               not self.is_expired()
+          )
+     
+     def can_accept(self) -> bool:
+          """Check if invitation can be accepted"""
+          return self.is_valid() and self.event.status == EventStatus.PUBLISHED
+     
+     def __str__(self):
+          return f"Invitation to {self.email} for {self.event.name}"

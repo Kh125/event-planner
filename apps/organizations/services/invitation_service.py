@@ -4,6 +4,7 @@ from django.db import transaction
 from apps.organizations.models import Organization, OrganizationInvitation
 from apps.organizations.serializers.invitation_serializer import InvitationSerializer
 from apps.users.models import CustomUser
+from services.notification.notification_service import OrganizationNotificationService
 
 class InvitationService:
      @staticmethod
@@ -46,8 +47,8 @@ class InvitationService:
                     email=email,
                )
                
-               # TODO: Send invitation email here
-               # send_invitation_email(invitation, validated_data.get('message', ''))
+               # Send invitation email using notification service
+               OrganizationNotificationService.send_invitation_notification(invitation)
                
                serializer = InvitationSerializer(invitation)
                
@@ -209,8 +210,8 @@ class InvitationService:
                invitation.expires_at = timezone.now() + timedelta(days=7)
                invitation.save()
           
-          # TODO: Send invitation email again
-          # send_invitation_email(invitation)
+          # Send invitation email again using notification service
+          OrganizationNotificationService.send_invitation_notification(invitation)
           
           serializer = InvitationSerializer(invitation)
           

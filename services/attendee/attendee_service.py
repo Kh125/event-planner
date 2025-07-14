@@ -2,6 +2,7 @@ from django.db import transaction
 from rest_framework.exceptions import ValidationError, NotFound
 from apps.events.models import Event, Attendee, AttendeeStatus
 from apps.events.serializers.event_serializer import AttendeeRegistrationSerializer, AttendeeSerializer, AttendeeStatusUpdateSerializer
+from services.notification.notification_service import EventNotificationService
 
 
 class AttendeeService:
@@ -44,7 +45,8 @@ class AttendeeService:
                     **validated_data
                )
                
-               # TODO: Send confirmation email
+               # Send registration confirmation email
+               EventNotificationService.send_attendee_registration_notification(attendee, event)
                
                # Serialize and return the data
                serializer = AttendeeSerializer(attendee)
@@ -223,11 +225,15 @@ class AttendeeService:
           except Attendee.DoesNotExist:
                raise NotFound("Attendee not found")
           
+          # Store old status for notification
+          old_status = attendee.status
+          
           # Update status
           attendee.status = validated_data['status']
           attendee.save()
           
-          # TODO: Send status update email to attendee
+          # Send status update email to attendee
+          EventNotificationService.send_attendee_status_update_notification(attendee, event, old_status)
           
           serializer = AttendeeSerializer(attendee)
           return serializer.data

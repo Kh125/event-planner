@@ -4,6 +4,7 @@ from apps.events.serializers.event_analytics_serializer import EventAnalyticsSer
 from apps.events.serializers.event_serializer import AttendeeRegistrationSerializer, EventCreateSerializer, EventUpdateSerializer
 from services.event.event_service import EventService
 from services.attendee.attendee_service import AttendeeService
+from services.notification.notification_service import EventNotificationService
 from utils.view.custom_api_views import CustomAPIView
 from core.middleware.authentication import TokenAuthentication
 from core.middleware.permission import CanCreateEvents, OwnerOrAdminPermission
@@ -168,7 +169,8 @@ class EventManageAPIView(CustomAPIView):
           event.is_public = False
           event.save()
           
-          # TODO: Send cancellation emails to attendees
+          # Send cancellation emails to all confirmed attendees
+          EventNotificationService.send_event_cancellation_notification(event)
           
           return self.success_response(
                message="Event cancelled successfully"

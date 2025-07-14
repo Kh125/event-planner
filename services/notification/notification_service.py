@@ -1,15 +1,13 @@
 from django.template import Template, Context
 from django.utils import timezone
 from django.conf import settings
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 import logging
-
 from apps.notifications.models import (
     Notification, NotificationTemplate, NotificationType, 
     NotificationChannel, NotificationStatus
 )
 from services.mail.mail_service import MailService
-
 
 logger = logging.getLogger(__name__)
 
@@ -142,7 +140,6 @@ class NotificationService:
      def _send_email_notification(notification: Notification) -> None:
           """Send email notification using existing MailService"""
           try:
-               # Use your existing MailService._send_mail method
                MailService._send_mail(
                     subject=notification.subject,
                     message=notification.message,
@@ -222,6 +219,7 @@ class NotificationService:
                                              }
                                         },
                
+               # Event Cancelled
                NotificationType.EVENT_CANCELLED: {
                     NotificationChannel.EMAIL: {
                          'subject_template': 'Event Cancelled: {{ event_name }}',
@@ -271,6 +269,7 @@ class NotificationService:
                               {{ organization_name }}
                               '''.strip()}},
                
+               # Attendee Confirmation
                NotificationType.ATTENDEE_CONFIRMED: {
                     NotificationChannel.EMAIL: {
                          'subject_template': 'Registration Approved: {{ event_name }}',
@@ -291,6 +290,7 @@ class NotificationService:
                               {{ organization_name }}
                               '''.strip()}},
                
+               # Attendee Waitlisted
                NotificationType.ATTENDEE_WAITLISTED: {
                     NotificationChannel.EMAIL: {
                          'subject_template': 'Added to Waitlist: {{ event_name }}',
@@ -312,7 +312,7 @@ class NotificationService:
                               {{ organization_name }}
                               '''.strip()}},
                
-               # Event Reminders
+               # Event Reminder 24 Hour
                NotificationType.EVENT_REMINDER_24H: {
                     NotificationChannel.EMAIL: {
                          'subject_template': 'Reminder: {{ event_name }} tomorrow',
@@ -333,6 +333,7 @@ class NotificationService:
                               {{ organization_name }}
                               '''.strip()}},
                
+               # Event Reminder 1 Hour
                NotificationType.EVENT_REMINDER_1H: {
                     NotificationChannel.EMAIL: {
                          'subject_template': 'Starting Soon: {{ event_name }} in 1 hour',
@@ -371,116 +372,116 @@ class NotificationService:
 
 # Convenience methods for specific notification types
 class EventNotificationService:
-    """Event-specific notification helpers"""
-    
-    @staticmethod
-    def send_attendee_registration_notification(attendee, event):
-        """Send registration confirmation to attendee"""
-        context = {
-            'attendee_name': attendee.full_name,
-            'event_name': event.name,
-            'event_date': event.start_datetime.strftime('%B %d, %Y'),
-            'event_time': event.start_datetime.strftime('%I:%M %p'),
-            'venue_name': event.venue_name,
-            'venue_address': event.venue_address,
-            'registration_status': attendee.status,
-            'organization_name': event.created_by.organization.name if event.created_by and event.created_by.organization else 'Event Organizer',
-            'registration_url': f"{settings.FRONTEND_BASE_URL}/events/{event.slug}"
-        }
-        
-        return NotificationService.send_notification(
-            notification_type=NotificationType.ATTENDEE_REGISTERED,
-            recipient_email=attendee.email,
-            context=context,
-            recipient_user=attendee.user,
-            event=event
-        )
-    
-    @staticmethod
-    def send_attendee_status_update_notification(attendee, event, old_status):
-        """Send status update notification to attendee"""
-        # Determine notification type based on new status
-        notification_type_map = {
-            'confirmed': NotificationType.ATTENDEE_CONFIRMED,
-            'rejected': NotificationType.ATTENDEE_REJECTED,
-            'waitlisted': NotificationType.ATTENDEE_WAITLISTED,
-        }
-        
-        notification_type = notification_type_map.get(attendee.status)
-        if not notification_type:
-            return None
-            
-        context = {
-            'attendee_name': attendee.full_name,
-            'event_name': event.name,
-            'event_date': event.start_datetime.strftime('%B %d, %Y'),
-            'event_time': event.start_datetime.strftime('%I:%M %p'),
-            'venue_name': event.venue_name,
-            'venue_address': event.venue_address,
-            'organization_name': event.created_by.organization.name if event.created_by and event.created_by.organization else 'Event Organizer',
-            'old_status': old_status,
-            'new_status': attendee.status
-        }
-        
-        return NotificationService.send_notification(
-            notification_type=notification_type,
-            recipient_email=attendee.email,
-            context=context,
-            recipient_user=attendee.user,
-            event=event
-        )
-    
-    @staticmethod
-    def send_event_cancellation_notification(event, attendees_queryset=None):
-        """Send cancellation notification to all confirmed attendees"""
-        if attendees_queryset is None:
-            attendees_queryset = event.attendees.filter(status='confirmed')
-        
-        notifications = []
-        for attendee in attendees_queryset:
-            context = {
-                'attendee_name': attendee.full_name,
-                'event_name': event.name,
-                'event_date': event.start_datetime.strftime('%B %d, %Y'),
-                'venue_name': event.venue_name,
-                'organization_name': event.created_by.organization.name if event.created_by and event.created_by.organization else 'Event Organizer',
-                'cancellation_reason': 'The event has been cancelled by the organizer.'
-            }
-            
-            notification = NotificationService.send_notification(
-                notification_type=NotificationType.EVENT_CANCELLED,
-                recipient_email=attendee.email,
-                context=context,
-                recipient_user=attendee.user,
-                event=event
-            )
-            notifications.append(notification)
-        
-        return notifications
+     """Event-specific notification helpers"""
+     
+     @staticmethod
+     def send_attendee_registration_notification(attendee, event):
+          """Send registration confirmation to attendee"""
+          context = {
+               'attendee_name': attendee.full_name,
+               'event_name': event.name,
+               'event_date': event.start_datetime.strftime('%B %d, %Y'),
+               'event_time': event.start_datetime.strftime('%I:%M %p'),
+               'venue_name': event.venue_name,
+               'venue_address': event.venue_address,
+               'registration_status': attendee.status,
+               'organization_name': event.created_by.organization.name if event.created_by and event.created_by.organization else 'Event Organizer',
+               'registration_url': f"{settings.FRONTEND_BASE_URL}/events/{event.slug}"
+          }
+          
+          return NotificationService.send_notification(
+               notification_type=NotificationType.ATTENDEE_REGISTERED,
+               recipient_email=attendee.email,
+               context=context,
+               recipient_user=attendee.user,
+               event=event
+          )
+     
+     @staticmethod
+     def send_attendee_status_update_notification(attendee, event, old_status):
+          """Send status update notification to attendee"""
+          # Determine notification type based on new status
+          notification_type_map = {
+               'confirmed': NotificationType.ATTENDEE_CONFIRMED,
+               'rejected': NotificationType.ATTENDEE_REJECTED,
+               'waitlisted': NotificationType.ATTENDEE_WAITLISTED,
+          }
+          
+          notification_type = notification_type_map.get(attendee.status)
+          if not notification_type:
+               return None
+               
+          context = {
+               'attendee_name': attendee.full_name,
+               'event_name': event.name,
+               'event_date': event.start_datetime.strftime('%B %d, %Y'),
+               'event_time': event.start_datetime.strftime('%I:%M %p'),
+               'venue_name': event.venue_name,
+               'venue_address': event.venue_address,
+               'organization_name': event.created_by.organization.name if event.created_by and event.created_by.organization else 'Event Organizer',
+               'old_status': old_status,
+               'new_status': attendee.status
+          }
+          
+          return NotificationService.send_notification(
+               notification_type=notification_type,
+               recipient_email=attendee.email,
+               context=context,
+               recipient_user=attendee.user,
+               event=event
+          )
+     
+     @staticmethod
+     def send_event_cancellation_notification(event, attendees_queryset=None):
+          """Send cancellation notification to all confirmed attendees"""
+          if attendees_queryset is None:
+               attendees_queryset = event.attendees.filter(status='confirmed')
+          
+          notifications = []
+          for attendee in attendees_queryset:
+               context = {
+                    'attendee_name': attendee.full_name,
+                    'event_name': event.name,
+                    'event_date': event.start_datetime.strftime('%B %d, %Y'),
+                    'venue_name': event.venue_name,
+                    'organization_name': event.created_by.organization.name if event.created_by and event.created_by.organization else 'Event Organizer',
+                    'cancellation_reason': 'The event has been cancelled by the organizer.'
+               }
+               
+               notification = NotificationService.send_notification(
+                    notification_type=NotificationType.EVENT_CANCELLED,
+                    recipient_email=attendee.email,
+                    context=context,
+                    recipient_user=attendee.user,
+                    event=event
+               )
+               notifications.append(notification)
+          
+          return notifications
 
 
 class OrganizationNotificationService:
-    """Organization-specific notification helpers"""
-    
-    @staticmethod
-    def send_invitation_notification(invitation):
-        """Send invitation email to invited user"""
-        invitation_url = f"{settings.FRONTEND_BASE_URL}/invitations/accept?token={invitation.token}"
-        
-        context = {
-            'recipient_name': invitation.email.split('@')[0].title(),  # Use email prefix as name
-            'organization_name': invitation.organization.name,
-            'role_name': 'Member',  # Default role, can be enhanced later
-            'message': getattr(invitation, 'message', 'You have been invited to join our organization.'),
-            'invitation_url': invitation_url,
-            'expires_at': invitation.expired_at.strftime('%B %d, %Y at %I:%M %p'),
-            'invited_by_name': invitation.invited_by.full_name if invitation.invited_by else 'Organization Admin'
-        }
-        
-        return NotificationService.send_notification(
-            notification_type=NotificationType.ORGANIZATION_INVITATION_SENT,
-            recipient_email=invitation.email,
-            context=context,
-            organization=invitation.organization,
-            invitation=invitation
-        )
+     """Organization-specific notification helpers"""
+     
+     @staticmethod
+     def send_invitation_notification(invitation):
+          """Send invitation email to invited user"""
+          invitation_url = f"{settings.FRONTEND_BASE_URL}/invitations/accept?token={invitation.token}"
+          
+          context = {
+               'recipient_name': invitation.email.split('@')[0].title(),  # Use email prefix as name
+               'organization_name': invitation.organization.name,
+               'role_name': 'Member',  # Default role, can be enhanced later
+               'message': getattr(invitation, 'message', 'You have been invited to join our organization.'),
+               'invitation_url': invitation_url,
+               'expires_at': invitation.expired_at.strftime('%B %d, %Y at %I:%M %p'),
+               'invited_by_name': invitation.invited_by.full_name if invitation.invited_by else 'Organization Admin'
+          }
+          
+          return NotificationService.send_notification(
+               notification_type=NotificationType.ORGANIZATION_INVITATION_SENT,
+               recipient_email=invitation.email,
+               context=context,
+               organization=invitation.organization,
+               invitation=invitation
+          )

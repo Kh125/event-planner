@@ -5,7 +5,7 @@ from datetime import timedelta
 
 from apps.events.models import Event, AttendeeInvitation, AttendeeInvitationStatus, Attendee, AttendeeStatus
 from apps.events.serializers.attendee_invitation_serializer import (
-    AttendeeInvitationSerializer, AttendeeInvitationStatsSerializer, PublicInvitationDetailSerializer
+    AttendeeInvitationSerializer, PublicInvitationDetailSerializer
 )
 from apps.events.serializers.event_serializer import AttendeeSerializer
 from services.notification.notification_service import EventNotificationService

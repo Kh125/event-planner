@@ -10,7 +10,7 @@ urlpatterns = [
     path('api/auth/', include('apps.users.urls')),
     path('api/organizations/', include('apps.organizations.urls')),
     path('api/invitations/', include('apps.organizations.invitation_urls')),
-    path('api/attendee-invitations/', include('apps.events.attendee_invitation_urls')),
+    path('api/attendee/invitations/', include('apps.events.attendee_invitation_urls')),
     path('api/events/', include('apps.events.urls')),
     path('api/notifications/', include('apps.notifications.urls')),
 ]

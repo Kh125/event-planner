@@ -34,10 +34,7 @@ from apps.events.views.public_event_view import (
 from apps.events.views.attendee_invitation_view import (
     AttendeeInvitationAPIView,
     AttendeeInvitationManagementAPIView,
-    AttendeeInvitationStatsAPIView,
-    PublicInvitationVerifyAPIView,
-    AcceptAttendeeInvitationAPIView,
-    RejectAttendeeInvitationAPIView
+    AttendeeInvitationStatsAPIView
 )
 
 urlpatterns = [

@@ -1,8 +1,6 @@
 from rest_framework import status
-from rest_framework.exceptions import NotFound
 from drf_spectacular.utils import extend_schema
-
-from apps.events.models import Event, AttendeeInvitation
+from apps.events.models import Event
 from apps.events.serializers.attendee_invitation_serializer import (
     SendAttendeeInvitationSerializer, AttendeeInvitationSerializer,
     AcceptAttendeeInvitationSerializer, RejectAttendeeInvitationSerializer,

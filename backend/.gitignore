@@ -40,5 +40,3 @@ Thumbs.db
 # General logs
 *.log
 logs/
-
-frontend-sample/

@@ -150,52 +150,46 @@ export default function TeamPage() {
                 return (
                   <div
                     key={member.id}
-                    className="group flex items-center justify-between p-6 bg-white border border-slate-100 rounded-xl hover:border-slate-200 hover:shadow-md transition-all duration-300"
+                    className="group flex items-center justify-between p-4 border border-slate-100 hover:border-slate-200 hover:bg-slate-50/60 rounded-xl transition-all duration-200"
                   >
-                    <div className="flex items-center space-x-5">
+                    <div className="flex items-center space-x-4">
                       <div className="relative">
-                        <div className="w-14 h-14 bg-gradient-to-br from-slate-700 to-slate-800 rounded-xl flex items-center justify-center shadow-sm">
-                          <span className="text-sm font-semibold text-white">
+                        <div className="w-10 h-10 bg-gradient-to-br from-slate-600 to-slate-700 rounded-lg flex items-center justify-center">
+                          <span className="text-xs font-medium text-white">
                             {member.name.split(' ').map(n => n[0]).join('').toUpperCase()}
                           </span>
                         </div>
                         {member.status === 'active' && (
-                          <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full ring-2 ring-white"></div>
+                          <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full ring-1 ring-white"></div>
                         )}
                       </div>
                       
                       <div className="flex-1">
-                        <div className="flex items-center space-x-3 mb-2">
-                          <h3 className="font-bold text-slate-900 text-lg">{member.name}</h3>
-                          <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${roleColorClass}`}>
-                            <RoleIcon className="w-3 h-3 mr-1.5" />
+                        <div className="flex items-center space-x-3 mb-1">
+                          <p className="font-medium text-slate-900">{member.name}</p>
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${roleColorClass}`}>
+                            <RoleIcon className="w-3 h-3 mr-1" />
                             {member.role}
                           </span>
                         </div>
-                        <div className="flex items-center space-x-6">
-                          <div className="flex items-center space-x-1.5 text-sm text-slate-600">
-                            <Mail className="w-4 h-4" />
-                            <span className="font-medium">{member.email}</span>
-                          </div>
-                          <div className="flex items-center space-x-1.5">
-                            <div className="w-2 h-2 bg-slate-400 rounded-full"></div>
-                            <span className={`text-xs font-semibold ${
-                              member.status === 'active' 
-                                ? 'text-emerald-600' 
-                                : 'text-slate-500'
-                            }`}>
-                              {member.status}
-                            </span>
-                          </div>
+                        <div className="flex items-center space-x-4">
+                          <p className="text-sm text-slate-600">{member.email}</p>
+                          <span className={`text-xs ${
+                            member.status === 'active' 
+                              ? 'text-emerald-600' 
+                              : 'text-slate-400'
+                          }`}>
+                            {member.status}
+                          </span>
                         </div>
                       </div>
                     </div>
                     
-                    <div className="flex items-center space-x-3 opacity-0 group-hover:opacity-100 transition-all duration-200">
+                    <div className="flex items-center space-x-2 transition-all duration-200">
                       <Button 
                         variant="outline" 
                         size="sm"
-                        className="bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border-slate-200 shadow-sm"
+                        className="bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border-slate-200 shadow-sm text-xs px-3 py-1"
                       >
                         Edit
                       </Button>
@@ -203,7 +197,7 @@ export default function TeamPage() {
                         variant="outline" 
                         size="sm"
                         onClick={() => handleRemoveMember(member.id)}
-                        className="bg-white hover:bg-red-50 text-red-600 hover:text-red-700 border-red-200 shadow-sm"
+                        className="bg-white hover:bg-red-50 text-red-600 hover:text-red-700 border-red-200 shadow-sm text-xs px-3 py-1"
                       >
                         Remove
                       </Button>

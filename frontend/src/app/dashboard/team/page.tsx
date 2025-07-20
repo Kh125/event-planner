@@ -135,12 +135,13 @@ export default function TeamPage() {
         </div>
 
         {/* Team Members */}
-        <Card className="border border-slate-200 bg-white">
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold text-slate-900">Team Members</CardTitle>
-            <CardDescription className="text-slate-600">Manage your team members and their permissions</CardDescription>
-          </CardHeader>
-          <CardContent>
+        <div className="bg-white rounded-xl shadow-sm">
+          <div className="p-6 pb-4">
+            <h2 className="text-xl font-bold text-slate-900 mb-2">Team Members</h2>
+            <p className="text-slate-600">Manage your team members and their permissions</p>
+          </div>
+          
+          <div className="px-6 pb-6">
             <div className="space-y-3">
               {teamMembers.map((member) => {
                 const RoleIcon = getRoleIcon(member.role);
@@ -149,48 +150,60 @@ export default function TeamPage() {
                 return (
                   <div
                     key={member.id}
-                    className="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-100 hover:border-slate-200 hover:bg-slate-100/50 transition-all duration-200"
+                    className="group flex items-center justify-between p-6 bg-white border border-slate-100 rounded-xl hover:border-slate-200 hover:shadow-md transition-all duration-300"
                   >
-                    <div className="flex items-center space-x-4">
-                      <div className="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center">
-                        <span className="text-sm font-medium text-white">
-                          {member.name.split(' ').map(n => n[0]).join('').toUpperCase()}
-                        </span>
+                    <div className="flex items-center space-x-5">
+                      <div className="relative">
+                        <div className="w-14 h-14 bg-gradient-to-br from-slate-700 to-slate-800 rounded-xl flex items-center justify-center shadow-sm">
+                          <span className="text-sm font-semibold text-white">
+                            {member.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                          </span>
+                        </div>
+                        {member.status === 'active' && (
+                          <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full ring-2 ring-white"></div>
+                        )}
                       </div>
                       
-                      <div>
-                        <div className="flex items-center space-x-3">
-                          <h3 className="font-medium text-slate-900">{member.name}</h3>
-                          <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${roleColorClass}`}>
-                            <RoleIcon className="w-3 h-3 mr-1" />
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-3 mb-2">
+                          <h3 className="font-bold text-slate-900 text-lg">{member.name}</h3>
+                          <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${roleColorClass}`}>
+                            <RoleIcon className="w-3 h-3 mr-1.5" />
                             {member.role}
                           </span>
                         </div>
-                        <div className="flex items-center space-x-4 mt-1">
-                          <div className="flex items-center space-x-1 text-sm text-slate-500">
-                            <Mail className="w-3 h-3" />
-                            <span>{member.email}</span>
+                        <div className="flex items-center space-x-6">
+                          <div className="flex items-center space-x-1.5 text-sm text-slate-600">
+                            <Mail className="w-4 h-4" />
+                            <span className="font-medium">{member.email}</span>
                           </div>
-                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                            member.status === 'active' 
-                              ? 'bg-emerald-100 text-emerald-800' 
-                              : 'bg-slate-100 text-slate-600'
-                          }`}>
-                            {member.status}
-                          </span>
+                          <div className="flex items-center space-x-1.5">
+                            <div className="w-2 h-2 bg-slate-400 rounded-full"></div>
+                            <span className={`text-xs font-semibold ${
+                              member.status === 'active' 
+                                ? 'text-emerald-600' 
+                                : 'text-slate-500'
+                            }`}>
+                              {member.status}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </div>
                     
-                    <div className="flex items-center space-x-2">
-                      <Button variant="outline" size="sm" className="text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+                    <div className="flex items-center space-x-3 opacity-0 group-hover:opacity-100 transition-all duration-200">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        className="bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border-slate-200 shadow-sm"
+                      >
                         Edit
                       </Button>
                       <Button 
                         variant="outline" 
-                        size="sm" 
+                        size="sm"
                         onClick={() => handleRemoveMember(member.id)}
-                        className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                        className="bg-white hover:bg-red-50 text-red-600 hover:text-red-700 border-red-200 shadow-sm"
                       >
                         Remove
                       </Button>
@@ -199,8 +212,8 @@ export default function TeamPage() {
                 );
               })}
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </DashboardLayout>
   );

@@ -105,37 +105,67 @@ export default function OrganizationPage() {
           </div>
           
           <div className="px-6 pb-6">
-            <div className="space-y-4">
-              <div className="group flex items-center space-x-4 p-5 bg-slate-50/50 rounded-xl hover:bg-slate-100/70 transition-all duration-200">
-                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                  <Users className="h-6 w-6 text-blue-600" />
+            <div className="space-y-3">
+              <div className="group flex items-center space-x-5 p-6 bg-white border border-slate-100 rounded-xl hover:border-slate-200 hover:shadow-md transition-all duration-300">
+                <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center">
+                  <Users className="h-7 w-7 text-blue-600" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-semibold text-slate-900">New team member added</p>
-                  <p className="text-sm text-slate-600 mt-1">Sarah Johnson joined as Event Coordinator</p>
-                  <p className="text-xs text-slate-500 mt-2">2 hours ago</p>
+                  <div className="flex items-center space-x-3 mb-2">
+                    <p className="font-bold text-slate-900 text-lg">New team member added</p>
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
+                      Team
+                    </span>
+                  </div>
+                  <div className="flex items-center space-x-6">
+                    <p className="text-sm text-slate-600 font-medium">Sarah Johnson joined as Event Coordinator</p>
+                    <div className="flex items-center space-x-1.5">
+                      <div className="w-2 h-2 bg-slate-400 rounded-full"></div>
+                      <p className="text-xs text-slate-500 font-medium">2 hours ago</p>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              <div className="group flex items-center space-x-4 p-5 bg-slate-50/50 rounded-xl hover:bg-slate-100/70 transition-all duration-200">
-                <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">
-                  <Calendar className="h-6 w-6 text-emerald-600" />
+              <div className="group flex items-center space-x-5 p-6 bg-white border border-slate-100 rounded-xl hover:border-slate-200 hover:shadow-md transition-all duration-300">
+                <div className="w-14 h-14 bg-emerald-100 rounded-xl flex items-center justify-center">
+                  <Calendar className="h-7 w-7 text-emerald-600" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-semibold text-slate-900">Event published</p>
-                  <p className="text-sm text-slate-600 mt-1">Tech Conference 2024 is now live</p>
-                  <p className="text-xs text-slate-500 mt-2">1 day ago</p>
+                  <div className="flex items-center space-x-3 mb-2">
+                    <p className="font-bold text-slate-900 text-lg">Event published</p>
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">
+                      Event
+                    </span>
+                  </div>
+                  <div className="flex items-center space-x-6">
+                    <p className="text-sm text-slate-600 font-medium">Tech Conference 2024 is now live</p>
+                    <div className="flex items-center space-x-1.5">
+                      <div className="w-2 h-2 bg-slate-400 rounded-full"></div>
+                      <p className="text-xs text-slate-500 font-medium">1 day ago</p>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              <div className="group flex items-center space-x-4 p-5 bg-slate-50/50 rounded-xl hover:bg-slate-100/70 transition-all duration-200">
-                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-                  <Building className="h-6 w-6 text-purple-600" />
+              <div className="group flex items-center space-x-5 p-6 bg-white border border-slate-100 rounded-xl hover:border-slate-200 hover:shadow-md transition-all duration-300">
+                <div className="w-14 h-14 bg-purple-100 rounded-xl flex items-center justify-center">
+                  <Building className="h-7 w-7 text-purple-600" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-semibold text-slate-900">Organization settings updated</p>
-                  <p className="text-sm text-slate-600 mt-1">Updated organization profile information</p>
-                  <p className="text-xs text-slate-500 mt-2">3 days ago</p>
+                  <div className="flex items-center space-x-3 mb-2">
+                    <p className="font-bold text-slate-900 text-lg">Organization settings updated</p>
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-100 text-purple-700">
+                      Settings
+                    </span>
+                  </div>
+                  <div className="flex items-center space-x-6">
+                    <p className="text-sm text-slate-600 font-medium">Updated organization profile information</p>
+                    <div className="flex items-center space-x-1.5">
+                      <div className="w-2 h-2 bg-slate-400 rounded-full"></div>
+                      <p className="text-xs text-slate-500 font-medium">3 days ago</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

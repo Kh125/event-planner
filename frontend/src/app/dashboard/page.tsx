@@ -1,7 +1,6 @@
 'use client';
 
 import { DashboardLayout } from '@/components/DashboardLayout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Calendar, Users, Building, TrendingUp, Plus } from 'lucide-react';
 
@@ -12,28 +11,32 @@ const stats = [
     value: '12',
     change: '+2 from last month',
     icon: Calendar,
-    color: 'text-blue-600',
+    iconBg: 'bg-blue-100',
+    iconColor: 'text-blue-600',
   },
   {
     title: 'Active Attendees',
     value: '1,234',
     change: '+15% from last month',
     icon: Users,
-    color: 'text-green-600',
+    iconBg: 'bg-emerald-100',
+    iconColor: 'text-emerald-600',
   },
   {
     title: 'Organizations',
     value: '8',
     change: '+1 from last month',
     icon: Building,
-    color: 'text-purple-600',
+    iconBg: 'bg-purple-100',
+    iconColor: 'text-purple-600',
   },
   {
     title: 'Success Rate',
     value: '98.5%',
     change: '+2.1% from last month',
     icon: TrendingUp,
-    color: 'text-emerald-600',
+    iconBg: 'bg-orange-100',
+    iconColor: 'text-orange-600',
   },
 ];
 
@@ -64,14 +67,14 @@ const recentEvents = [
 export default function DashboardPage() {
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <div className="space-y-10">
         {/* Header */}
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-            <p className="text-gray-600">Welcome back! Here's what's happening with your events.</p>
+            <h1 className="text-3xl font-bold text-slate-900">Dashboard</h1>
+            <p className="text-slate-600 mt-3 text-lg">Welcome back! Here's what's happening with your events.</p>
           </div>
-          <Button className="bg-gray-900 hover:bg-gray-800 text-white">
+          <Button className="bg-slate-900 hover:bg-slate-800 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-6 py-2.5">
             <Plus className="mr-2 h-4 w-4" />
             Create Event
           </Button>
@@ -80,60 +83,81 @@ export default function DashboardPage() {
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {stats.map((stat, index) => (
-            <Card key={index} className="border border-gray-200">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-gray-600">
-                  {stat.title}
-                </CardTitle>
-                <stat.icon className={`h-4 w-4 ${stat.color}`} />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
-                <p className="text-xs text-gray-500 mt-1">{stat.change}</p>
-              </CardContent>
-            </Card>
+            <div key={index} className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow duration-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-slate-600 mb-2">{stat.title}</p>
+                  <p className="text-3xl font-bold text-slate-900">{stat.value}</p>
+                  <p className="text-sm text-emerald-600 mt-1 font-medium">{stat.change}</p>
+                </div>
+                <div className={`${stat.iconBg} p-3 rounded-full`}>
+                  <stat.icon className={`h-6 w-6 ${stat.iconColor}`} />
+                </div>
+              </div>
+            </div>
           ))}
         </div>
 
         {/* Recent Events */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Events</CardTitle>
-            <CardDescription>Your latest events and their performance</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
+        <div className="bg-white rounded-xl shadow-sm">
+          <div className="p-6 pb-4">
+            <h2 className="text-xl font-bold text-slate-900 mb-2">Recent Events</h2>
+            <p className="text-slate-600">Your latest events and their performance</p>
+          </div>
+          
+          <div className="px-6 pb-6">
+            <div className="space-y-3">
               {recentEvents.map((event, index) => (
-                <div key={event.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center border border-gray-200">
-                      <Calendar className="h-5 w-5 text-gray-600" />
+                <div key={event.id} className="group flex items-center justify-between p-6 bg-white border border-slate-100 rounded-xl hover:border-slate-200 hover:shadow-md transition-all duration-300">
+                  <div className="flex items-center space-x-5">
+                    <div className={`relative w-14 h-14 rounded-xl flex items-center justify-center ${
+                      event.status === 'upcoming' ? 'bg-blue-100' :
+                      event.status === 'ongoing' ? 'bg-emerald-100' :
+                      'bg-slate-100'
+                    }`}>
+                      <Calendar className={`h-7 w-7 ${
+                        event.status === 'upcoming' ? 'text-blue-600' :
+                        event.status === 'ongoing' ? 'text-emerald-600' :
+                        'text-slate-600'
+                      }`} />
+                      {event.status === 'ongoing' && (
+                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full ring-2 ring-white animate-pulse"></div>
+                      )}
                     </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900">{event.title}</h3>
-                      <p className="text-sm text-gray-500">{event.date}</p>
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-3 mb-2">
+                        <h3 className="font-bold text-slate-900 text-lg">{event.title}</h3>
+                        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${
+                          event.status === 'upcoming' ? 'bg-blue-100 text-blue-700' :
+                          event.status === 'ongoing' ? 'bg-emerald-100 text-emerald-700' :
+                          'bg-slate-100 text-slate-700'
+                        }`}>
+                          {event.status}
+                        </span>
+                      </div>
+                      <div className="flex items-center space-x-6">
+                        <p className="text-sm text-slate-600 font-medium">{event.date}</p>
+                        <div className="flex items-center space-x-1.5">
+                          <div className="w-2 h-2 bg-slate-400 rounded-full"></div>
+                          <p className="text-sm text-slate-600 font-medium">{event.attendees} attendees</p>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-4">
-                    <div className="text-right">
-                      <p className="text-sm font-medium text-gray-900">{event.attendees} attendees</p>
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        event.status === 'upcoming' ? 'bg-blue-100 text-blue-800' :
-                        event.status === 'ongoing' ? 'bg-green-100 text-green-800' :
-                        'bg-gray-100 text-gray-800'
-                      }`}>
-                        {event.status}
-                      </span>
-                    </div>
-                    <Button variant="outline" size="sm">
+                  <div className="flex items-center space-x-3">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border-slate-200 shadow-sm opacity-0 group-hover:opacity-100 transition-all duration-200"
+                    >
                       View Details
                     </Button>
                   </div>
                 </div>
               ))}
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </DashboardLayout>
   );

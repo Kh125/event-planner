@@ -18,49 +18,57 @@ export function EventCard({ event, onRegister, onEdit, onDelete, isAdmin }: Even
   const isFullyBooked = event.registered >= event.capacity;
   
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-colors">
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-base font-semibold text-gray-900">{event.title}</h3>
-        <span className={`px-2 py-1 rounded-md text-xs font-medium border ${
-          event.status === 'upcoming' ? 'bg-blue-50 text-blue-700 border-blue-200' :
-          event.status === 'ongoing' ? 'bg-green-50 text-green-700 border-green-200' :
-          'bg-gray-50 text-gray-700 border-gray-200'
+    <div className="group bg-white rounded-xl p-6 shadow-sm hover:shadow-lg transition-all duration-300 hover:scale-[1.02]">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-bold text-slate-900">{event.title}</h3>
+        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+          event.status === 'upcoming' ? 'bg-blue-100 text-blue-700' :
+          event.status === 'ongoing' ? 'bg-emerald-100 text-emerald-700' :
+          'bg-slate-100 text-slate-700'
         }`}>
           {event.status}
         </span>
       </div>
       
-      <p className="text-sm text-gray-600 mb-3 line-clamp-2">{event.description}</p>
+      <p className="text-sm text-slate-600 mb-5 line-clamp-2">{event.description}</p>
       
-      <div className="space-y-2 mb-4">
-        <div className="flex items-center text-sm text-gray-600">
-          <Calendar className="h-4 w-4 mr-2" />
+      <div className="space-y-3 mb-6">
+        <div className="flex items-center text-sm text-slate-600">
+          <div className="bg-blue-100 p-1.5 rounded-md mr-3">
+            <Calendar className="h-3.5 w-3.5 text-blue-600" />
+          </div>
           {formatDateTime(event.date)}
         </div>
-        <div className="flex items-center text-sm text-gray-600">
-          <MapPin className="h-4 w-4 mr-2" />
+        <div className="flex items-center text-sm text-slate-600">
+          <div className="bg-emerald-100 p-1.5 rounded-md mr-3">
+            <MapPin className="h-3.5 w-3.5 text-emerald-600" />
+          </div>
           {event.location}
         </div>
-        <div className="flex items-center text-sm text-gray-600">
-          <Users className="h-4 w-4 mr-2" />
+        <div className="flex items-center text-sm text-slate-600">
+          <div className="bg-orange-100 p-1.5 rounded-md mr-3">
+            <Users className="h-3.5 w-3.5 text-orange-600" />
+          </div>
           {event.registered}/{event.capacity} registered
         </div>
       </div>
       
-      <div className="flex gap-2">
+      <div className="flex gap-2 pt-2 border-t border-slate-100">
         {isAdmin ? (
           <>
             <Button 
               variant="outline" 
               size="sm"
               onClick={() => onEdit?.(event.id)}
+              className="flex-1 bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 shadow-sm"
             >
               Edit
             </Button>
             <Button 
-              variant="destructive" 
+              variant="outline" 
               size="sm"
               onClick={() => onDelete?.(event.id)}
+              className="flex-1 bg-white hover:bg-red-50 text-red-600 hover:text-red-700 shadow-sm"
             >
               Delete
             </Button>
@@ -71,7 +79,7 @@ export function EventCard({ event, onRegister, onEdit, onDelete, isAdmin }: Even
             size="sm"
             onClick={() => onRegister?.(event.id)}
             disabled={!isUpcoming || isFullyBooked}
-            className="w-full"
+            className="w-full bg-slate-900 hover:bg-slate-800 text-white shadow-sm"
           >
             {isFullyBooked ? 'Fully Booked' : 
              !isUpcoming ? 'Registration Closed' : 'Register'}

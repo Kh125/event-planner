@@ -2,7 +2,6 @@
 
 import { DashboardLayout } from '@/components/DashboardLayout';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { EventCard } from '@/components/EventCard';
 import { Event } from '@/types';
 import { Plus, Calendar, Users, Clock } from 'lucide-react';
@@ -80,14 +79,14 @@ export default function EventsPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <div className="space-y-10">
         {/* Header */}
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Events</h1>
-            <p className="text-gray-600">Manage and organize your events</p>
+            <h1 className="text-3xl font-bold text-slate-900">Events</h1>
+            <p className="text-slate-600 mt-3 text-lg">Manage and organize your events</p>
           </div>
-          <Button className="bg-gray-900 hover:bg-gray-800 text-white">
+          <Button className="bg-slate-900 hover:bg-slate-800 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-6 py-2.5">
             <Plus className="mr-2 h-4 w-4" />
             Create Event
           </Button>
@@ -95,46 +94,53 @@ export default function EventsPage() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="border border-gray-200">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Total Events</CardTitle>
-              <Calendar className="h-4 w-4 text-gray-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-gray-900">{events.length}</div>
-            </CardContent>
-          </Card>
-
-          <Card className="border border-gray-200">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Total Attendees</CardTitle>
-              <Users className="h-4 w-4 text-gray-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-gray-900">
-                {events.reduce((total, event) => total + event.registered, 0)}
+          <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow duration-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-slate-600 mb-2">Total Events</p>
+                <p className="text-3xl font-bold text-slate-900">{events.length}</p>
               </div>
-            </CardContent>
-          </Card>
+              <div className="bg-blue-100 p-3 rounded-full">
+                <Calendar className="h-6 w-6 text-blue-600" />
+              </div>
+            </div>
+          </div>
 
-          <Card className="border border-gray-200">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Upcoming</CardTitle>
-              <Clock className="h-4 w-4 text-gray-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-gray-900">{upcomingEvents.length}</div>
-            </CardContent>
-          </Card>
+          <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow duration-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-slate-600 mb-2">Total Attendees</p>
+                <p className="text-3xl font-bold text-slate-900">
+                  {events.reduce((total, event) => total + event.registered, 0)}
+                </p>
+              </div>
+              <div className="bg-emerald-100 p-3 rounded-full">
+                <Users className="h-6 w-6 text-emerald-600" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow duration-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-slate-600 mb-2">Upcoming</p>
+                <p className="text-3xl font-bold text-slate-900">{upcomingEvents.length}</p>
+              </div>
+              <div className="bg-orange-100 p-3 rounded-full">
+                <Clock className="h-6 w-6 text-orange-600" />
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Upcoming Events */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Upcoming Events</CardTitle>
-            <CardDescription>Events scheduled for the future</CardDescription>
-          </CardHeader>
-          <CardContent>
+        <div className="bg-white rounded-xl shadow-sm">
+          <div className="p-6 pb-4">
+            <h2 className="text-xl font-bold text-slate-900 mb-2">Upcoming Events</h2>
+            <p className="text-slate-600">Events scheduled for the future</p>
+          </div>
+          
+          <div className="px-6 pb-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {upcomingEvents.map((event) => (
                 <EventCard
@@ -147,17 +153,18 @@ export default function EventsPage() {
                 />
               ))}
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Completed Events */}
         {completedEvents.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Completed Events</CardTitle>
-              <CardDescription>Past events and their results</CardDescription>
-            </CardHeader>
-            <CardContent>
+          <div className="bg-white rounded-xl shadow-sm">
+            <div className="p-6 pb-4">
+              <h2 className="text-xl font-bold text-slate-900 mb-2">Completed Events</h2>
+              <p className="text-slate-600">Past events and their results</p>
+            </div>
+            
+            <div className="px-6 pb-6">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {completedEvents.map((event) => (
                   <EventCard
@@ -169,8 +176,8 @@ export default function EventsPage() {
                   />
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         )}
       </div>
     </DashboardLayout>

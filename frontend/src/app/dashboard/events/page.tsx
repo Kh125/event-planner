@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { EventCard } from '@/components/EventCard';
 import { Event } from '@/types';
 import { Plus, Calendar, Users, Clock } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 // Sample events data
 const events: Event[] = [
@@ -62,6 +63,15 @@ const events: Event[] = [
 ];
 
 export default function EventsPage() {
+  const router = useRouter();
+
+  const handleCreateEvent = () => {
+    router.push('/dashboard/events/create');
+  };
+
+  const handleEventClick = (eventId: string) => {
+    router.push(`/dashboard/events/${eventId}`);
+  };
   const handleRegister = (eventId: string) => {
     console.log('Register for event:', eventId);
   };
@@ -86,7 +96,10 @@ export default function EventsPage() {
             <h1 className="text-3xl font-bold text-slate-900">Events</h1>
             <p className="text-slate-600 mt-3 text-lg">Manage and organize your events</p>
           </div>
-          <Button className="bg-slate-900 hover:bg-slate-800 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-6 py-2.5">
+          <Button 
+            onClick={handleCreateEvent}
+            className="bg-slate-900 hover:bg-slate-800 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-6 py-2.5 hover:scale-105"
+          >
             <Plus className="mr-2 h-4 w-4" />
             Create Event
           </Button>
@@ -149,6 +162,7 @@ export default function EventsPage() {
                   onRegister={handleRegister}
                   onEdit={handleEdit}
                   onDelete={handleDelete}
+                  onClick={handleEventClick}
                   isAdmin={true}
                 />
               ))}
@@ -172,6 +186,7 @@ export default function EventsPage() {
                     event={event}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
+                    onClick={handleEventClick}
                     isAdmin={true}
                   />
                 ))}

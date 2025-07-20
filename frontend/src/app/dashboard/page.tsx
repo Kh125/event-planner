@@ -3,6 +3,7 @@
 import { DashboardLayout } from '@/components/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Calendar, Users, Building, TrendingUp, Plus } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 // Sample data
 const stats = [
@@ -65,6 +66,16 @@ const recentEvents = [
 ];
 
 export default function DashboardPage() {
+  const router = useRouter();
+
+  const handleCreateEvent = () => {
+    router.push('/dashboard/events/create');
+  };
+
+  const handleEventDetails = (eventId: number) => {
+    router.push(`/dashboard/events/${eventId}`);
+  };
+
   return (
     <DashboardLayout>
       <div className="space-y-10">
@@ -74,7 +85,10 @@ export default function DashboardPage() {
             <h1 className="text-3xl font-bold text-slate-900">Dashboard</h1>
             <p className="text-slate-600 mt-3 text-lg">Welcome back! Here's what's happening with your events.</p>
           </div>
-          <Button className="bg-slate-900 hover:bg-slate-800 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-6 py-2.5">
+          <Button 
+            onClick={handleCreateEvent}
+            className="bg-slate-900 hover:bg-slate-800 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-6 py-2.5 hover:scale-105"
+          >
             <Plus className="mr-2 h-4 w-4" />
             Create Event
           </Button>
@@ -141,7 +155,8 @@ export default function DashboardPage() {
                   <Button 
                     variant="outline" 
                     size="sm"
-                    className="bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border-slate-200 shadow-sm transition-all duration-200"
+                    onClick={() => handleEventDetails(event.id)}
+                    className="bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border-slate-200 shadow-sm transition-all duration-200 hover:scale-105"
                   >
                     View Details
                   </Button>

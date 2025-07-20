@@ -2,140 +2,145 @@
 
 import { DashboardLayout } from '@/components/DashboardLayout';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Building, Users, Calendar, Settings } from 'lucide-react';
+import { Building, Users, Calendar, Settings, TrendingUp } from 'lucide-react';
 
 export default function OrganizationPage() {
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <div className="space-y-10">
         {/* Header */}
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Organization</h1>
-            <p className="text-gray-600">Manage your organization settings and information</p>
+            <h1 className="text-3xl font-bold text-slate-900">Organization</h1>
+            <p className="text-slate-600 mt-3 text-lg">Manage your organization settings and information</p>
           </div>
-          <Button variant="outline">
+          <Button variant="outline" className="bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 shadow-sm">
             <Settings className="mr-2 h-4 w-4" />
             Settings
           </Button>
         </div>
 
         {/* Organization Info Card */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Organization Information</CardTitle>
-            <CardDescription>Basic information about your organization</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Organization Name
-                </label>
-                <p className="text-lg font-semibold text-gray-900">Tech Events Inc.</p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Industry
-                </label>
-                <p className="text-lg text-gray-900">Technology & Events</p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Location
-                </label>
-                <p className="text-lg text-gray-900">San Francisco, CA</p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Founded
-                </label>
-                <p className="text-lg text-gray-900">2020</p>
-              </div>
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="mb-6">
+            <h2 className="text-xl font-bold text-slate-900 mb-2">Organization Information</h2>
+            <p className="text-slate-600">Basic information about your organization</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-slate-500 uppercase tracking-wide">
+                Organization Name
+              </label>
+              <p className="text-xl font-bold text-slate-900">Tech Events Inc.</p>
             </div>
-          </CardContent>
-        </Card>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-slate-500 uppercase tracking-wide">
+                Industry
+              </label>
+              <p className="text-xl text-slate-900">Technology & Events</p>
+            </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-slate-500 uppercase tracking-wide">
+                Location
+              </label>
+              <p className="text-xl text-slate-900">San Francisco, CA</p>
+            </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-slate-500 uppercase tracking-wide">
+                Founded
+              </label>
+              <p className="text-xl text-slate-900">2020</p>
+            </div>
+          </div>
+        </div>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Total Members</CardTitle>
-              <Users className="h-4 w-4 text-blue-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-gray-900">24</div>
-              <p className="text-xs text-gray-500 mt-1">+3 from last month</p>
-            </CardContent>
-          </Card>
+          <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow duration-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-slate-600 mb-2">Total Members</p>
+                <p className="text-3xl font-bold text-slate-900">24</p>
+                <p className="text-sm text-emerald-600 mt-1 font-medium">+3 from last month</p>
+              </div>
+              <div className="bg-blue-100 p-3 rounded-full">
+                <Users className="h-6 w-6 text-blue-600" />
+              </div>
+            </div>
+          </div>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Events Hosted</CardTitle>
-              <Calendar className="h-4 w-4 text-green-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-gray-900">156</div>
-              <p className="text-xs text-gray-500 mt-1">+12 from last month</p>
-            </CardContent>
-          </Card>
+          <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow duration-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-slate-600 mb-2">Events Hosted</p>
+                <p className="text-3xl font-bold text-slate-900">156</p>
+                <p className="text-sm text-emerald-600 mt-1 font-medium">+12 from last month</p>
+              </div>
+              <div className="bg-emerald-100 p-3 rounded-full">
+                <Calendar className="h-6 w-6 text-emerald-600" />
+              </div>
+            </div>
+          </div>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Success Rate</CardTitle>
-              <Building className="h-4 w-4 text-purple-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-gray-900">98.5%</div>
-              <p className="text-xs text-gray-500 mt-1">+2.1% from last month</p>
-            </CardContent>
-          </Card>
+          <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow duration-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-slate-600 mb-2">Success Rate</p>
+                <p className="text-3xl font-bold text-slate-900">98.5%</p>
+                <p className="text-sm text-emerald-600 mt-1 font-medium">+2.1% from last month</p>
+              </div>
+              <div className="bg-purple-100 p-3 rounded-full">
+                <TrendingUp className="h-6 w-6 text-purple-600" />
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Recent Activity */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-            <CardDescription>Latest organizational updates and changes</CardDescription>
-          </CardHeader>
-          <CardContent>
+        <div className="bg-white rounded-xl shadow-sm">
+          <div className="p-6 pb-4">
+            <h2 className="text-xl font-bold text-slate-900 mb-2">Recent Activity</h2>
+            <p className="text-slate-600">Latest organizational updates and changes</p>
+          </div>
+          
+          <div className="px-6 pb-6">
             <div className="space-y-4">
-              <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
-                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <Users className="h-5 w-5 text-blue-600" />
+              <div className="group flex items-center space-x-4 p-5 bg-slate-50/50 rounded-xl hover:bg-slate-100/70 transition-all duration-200">
+                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                  <Users className="h-6 w-6 text-blue-600" />
                 </div>
-                <div>
-                  <p className="font-medium text-gray-900">New team member added</p>
-                  <p className="text-sm text-gray-500">Sarah Johnson joined as Event Coordinator</p>
-                  <p className="text-xs text-gray-400">2 hours ago</p>
-                </div>
-              </div>
-
-              <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
-                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                  <Calendar className="h-5 w-5 text-green-600" />
-                </div>
-                <div>
-                  <p className="font-medium text-gray-900">Event published</p>
-                  <p className="text-sm text-gray-500">Tech Conference 2024 is now live</p>
-                  <p className="text-xs text-gray-400">1 day ago</p>
+                <div className="flex-1">
+                  <p className="font-semibold text-slate-900">New team member added</p>
+                  <p className="text-sm text-slate-600 mt-1">Sarah Johnson joined as Event Coordinator</p>
+                  <p className="text-xs text-slate-500 mt-2">2 hours ago</p>
                 </div>
               </div>
 
-              <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
-                <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <Building className="h-5 w-5 text-purple-600" />
+              <div className="group flex items-center space-x-4 p-5 bg-slate-50/50 rounded-xl hover:bg-slate-100/70 transition-all duration-200">
+                <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">
+                  <Calendar className="h-6 w-6 text-emerald-600" />
                 </div>
-                <div>
-                  <p className="font-medium text-gray-900">Organization settings updated</p>
-                  <p className="text-sm text-gray-500">Updated organization profile information</p>
-                  <p className="text-xs text-gray-400">3 days ago</p>
+                <div className="flex-1">
+                  <p className="font-semibold text-slate-900">Event published</p>
+                  <p className="text-sm text-slate-600 mt-1">Tech Conference 2024 is now live</p>
+                  <p className="text-xs text-slate-500 mt-2">1 day ago</p>
+                </div>
+              </div>
+
+              <div className="group flex items-center space-x-4 p-5 bg-slate-50/50 rounded-xl hover:bg-slate-100/70 transition-all duration-200">
+                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                  <Building className="h-6 w-6 text-purple-600" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-semibold text-slate-900">Organization settings updated</p>
+                  <p className="text-sm text-slate-600 mt-1">Updated organization profile information</p>
+                  <p className="text-xs text-slate-500 mt-2">3 days ago</p>
                 </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </DashboardLayout>
   );

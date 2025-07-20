@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calendar, Clock, MapPin, Users, ArrowLeft, Save, Eye } from 'lucide-react';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useInstantRouter } from '@/hooks/useInstantRouter';
 
 const EventStatus = {
   DRAFT: 'draft',
@@ -19,7 +19,7 @@ const RegistrationType = {
 } as const;
 
 export default function CreateEventPage() {
-  const router = useRouter();
+  const router = useInstantRouter();
   
   const [formData, setFormData] = useState({
     name: '',

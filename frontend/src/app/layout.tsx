@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { RouterCacheProvider } from "@/components/RouterCacheProvider";
 
 export const metadata: Metadata = {
   title: "Event Planner",
@@ -14,7 +15,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased">
-        {children}
+        <RouterCacheProvider>
+          {children}
+        </RouterCacheProvider>
       </body>
     </html>
   );

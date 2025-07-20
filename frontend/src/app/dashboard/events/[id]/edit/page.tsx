@@ -75,9 +75,9 @@ export default function EditEventPage() {
         venue_name: eventData.venue_name,
         venue_address: eventData.venue_address,
         timezone: eventData.timezone,
-        status: eventData.status as any,
+        status: eventData.status as typeof EventStatus.DRAFT,
         is_public: eventData.is_public,
-        registration_type: eventData.registration_type as any,
+        registration_type: eventData.registration_type as typeof RegistrationType.OPEN,
         registration_opens: eventData.registration_opens,
         registration_closes: eventData.registration_closes,
         requires_approval: eventData.requires_approval

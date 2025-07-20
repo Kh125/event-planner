@@ -4,7 +4,6 @@ import { Event } from '@/types';
 import { formatDateTime } from '@/lib/utils';
 import { Button } from './ui/button';
 import { Calendar, MapPin, Users } from 'lucide-react';
-import Link from 'next/link';
 
 interface EventCardProps {
   event: Event;

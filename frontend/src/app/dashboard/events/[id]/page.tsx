@@ -9,7 +9,6 @@ import {
   MapPin, 
   Users, 
   Globe, 
-  Shield, 
   ArrowLeft, 
   Edit, 
   Share2, 

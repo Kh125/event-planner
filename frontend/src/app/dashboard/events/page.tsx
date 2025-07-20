@@ -3,9 +3,12 @@
 import { DashboardLayout } from '@/components/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { EventCard } from '@/components/EventCard';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { Event } from '@/types';
 import { Plus, Calendar, Users, Clock } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
 
 // Sample events data
 const events: Event[] = [
@@ -64,6 +67,8 @@ const events: Event[] = [
 
 export default function EventsPage() {
   const router = useRouter();
+  const [eventToDelete, setEventToDelete] = useState<string | null>(null);
+  const [eventsData, setEventsData] = useState<Event[]>(events);
 
   const handleCreateEvent = () => {
     router.push('/dashboard/events/create');
@@ -72,20 +77,35 @@ export default function EventsPage() {
   const handleEventClick = (eventId: string) => {
     router.push(`/dashboard/events/${eventId}`);
   };
+  
   const handleRegister = (eventId: string) => {
     console.log('Register for event:', eventId);
   };
 
   const handleEdit = (eventId: string) => {
-    console.log('Edit event:', eventId);
+    router.push(`/dashboard/events/${eventId}/edit`);
   };
 
   const handleDelete = (eventId: string) => {
-    console.log('Delete event:', eventId);
+    setEventToDelete(eventId);
   };
 
-  const upcomingEvents = events.filter(event => event.status === 'upcoming');
-  const completedEvents = events.filter(event => event.status === 'completed');
+  const handleConfirmDelete = () => {
+    if (eventToDelete) {
+      console.log('Deleting event:', eventToDelete);
+      // Remove event from local state (in real app, this would be an API call)
+      setEventsData(prev => prev.filter(event => event.id !== eventToDelete));
+      setEventToDelete(null);
+    }
+  };
+
+  const getEventToDeleteName = () => {
+    const event = eventsData.find(e => e.id === eventToDelete);
+    return event?.title || 'this event';
+  };
+
+  const upcomingEvents = eventsData.filter(event => event.status === 'upcoming');
+  const completedEvents = eventsData.filter(event => event.status === 'completed');
 
   return (
     <DashboardLayout>
@@ -96,13 +116,14 @@ export default function EventsPage() {
             <h1 className="text-3xl font-bold text-slate-900">Events</h1>
             <p className="text-slate-600 mt-3 text-lg">Manage and organize your events</p>
           </div>
-          <Button 
-            onClick={handleCreateEvent}
-            className="bg-slate-900 hover:bg-slate-800 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-6 py-2.5 hover:scale-105"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Create Event
-          </Button>
+          <Link href="/dashboard/events/create" prefetch={true}>
+            <Button 
+              className="bg-slate-900 hover:bg-slate-800 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-6 py-2.5 hover:scale-105"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Create Event
+            </Button>
+          </Link>
         </div>
 
         {/* Stats Cards */}
@@ -195,6 +216,18 @@ export default function EventsPage() {
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={!!eventToDelete}
+        onClose={() => setEventToDelete(null)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Event"
+        description={`Are you sure you want to delete "${getEventToDeleteName()}"? This action cannot be undone and all associated data will be permanently removed.`}
+        confirmText="Delete Event"
+        cancelText="Cancel"
+        variant="destructive"
+      />
     </DashboardLayout>
   );
 }

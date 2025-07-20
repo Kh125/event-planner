@@ -20,10 +20,12 @@ import {
   CheckCircle,
   XCircle,
   Clock3,
-  AlertCircle
+  AlertCircle,
+  Trash2
 } from 'lucide-react';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 
 // Mock data - in real app this would come from API
 const eventData = {
@@ -126,11 +128,24 @@ const formatDateTime = (dateTime: string) => {
 
 export default function EventDetailsPage() {
   const router = useRouter();
+  const params = useParams();
+  const eventId = params.id as string;
   const [activeTab, setActiveTab] = useState('overview');
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const handleEditEvent = () => {
-    // Navigate to edit page (you can create this later)
-    console.log('Edit event');
+    router.push(`/dashboard/events/${eventId}/edit`);
+  };
+
+  const handleDeleteEvent = () => {
+    setShowDeleteDialog(true);
+  };
+
+  const handleConfirmDelete = () => {
+    console.log('Deleting event:', eventId);
+    // Here you would make the API call to delete the event
+    setShowDeleteDialog(false);
+    router.push('/dashboard/events');
   };
 
   const handleShareEvent = () => {
@@ -180,6 +195,14 @@ export default function EventDetailsPage() {
             >
               <Share2 className="h-4 w-4 mr-2" />
               Share
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={handleDeleteEvent}
+              className="bg-white hover:bg-red-50 text-red-600 hover:text-red-700 border-slate-200 hover:scale-105 transition-all duration-200"
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Delete
             </Button>
             <Button 
               onClick={handleEditEvent}
@@ -477,6 +500,18 @@ export default function EventDetailsPage() {
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={showDeleteDialog}
+        onClose={() => setShowDeleteDialog(false)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Event"
+        description={`Are you sure you want to delete "${eventData.name}"? This action cannot be undone and all associated data will be permanently removed.`}
+        confirmText="Delete Event"
+        cancelText="Cancel"
+        variant="destructive"
+      />
     </DashboardLayout>
   );
 }

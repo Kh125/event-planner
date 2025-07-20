@@ -4,8 +4,8 @@ import { DashboardLayout } from '@/components/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calendar, Clock, MapPin, Users, ArrowLeft, Save, Eye } from 'lucide-react';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter, useParams } from 'next/navigation';
 
 const EventStatus = {
   DRAFT: 'draft',
@@ -18,8 +18,30 @@ const RegistrationType = {
   APPROVAL_REQUIRED: 'approval_required'
 } as const;
 
-export default function CreateEventPage() {
+// Mock data - in real app this would come from API
+const mockEventData = {
+  '1': {
+    name: 'Tech Conference 2024',
+    description: 'Join us for the biggest tech conference of the year featuring talks from industry leaders.',
+    start_datetime: '2024-06-15T09:00',
+    end_datetime: '2024-06-17T18:00',
+    capacity: '500',
+    venue_name: 'San Francisco Convention Center',
+    venue_address: '747 Howard St, San Francisco, CA 94103, USA',
+    timezone: 'America/Los_Angeles',
+    status: 'published',
+    is_public: true,
+    registration_type: 'open',
+    registration_opens: '2024-03-01T00:00',
+    registration_closes: '2024-06-10T23:59',
+    requires_approval: false
+  }
+};
+
+export default function EditEventPage() {
   const router = useRouter();
+  const params = useParams();
+  const eventId = params.id as string;
   
   const [formData, setFormData] = useState({
     name: '',
@@ -38,6 +60,32 @@ export default function CreateEventPage() {
     requires_approval: false
   });
 
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // In real app, fetch event data from API
+    const eventData = mockEventData[eventId as keyof typeof mockEventData];
+    if (eventData) {
+      setFormData({
+        name: eventData.name,
+        description: eventData.description,
+        start_datetime: eventData.start_datetime,
+        end_datetime: eventData.end_datetime,
+        capacity: eventData.capacity,
+        venue_name: eventData.venue_name,
+        venue_address: eventData.venue_address,
+        timezone: eventData.timezone,
+        status: eventData.status as any,
+        is_public: eventData.is_public,
+        registration_type: eventData.registration_type as any,
+        registration_opens: eventData.registration_opens,
+        registration_closes: eventData.registration_closes,
+        requires_approval: eventData.requires_approval
+      });
+    }
+    setLoading(false);
+  }, [eventId]);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     setFormData(prev => ({
@@ -52,19 +100,28 @@ export default function CreateEventPage() {
       ...formData,
       status: isDraft ? EventStatus.DRAFT : EventStatus.PUBLISHED
     };
-    console.log('Submitting event:', finalData);
-    // Here you would make the API call to create the event
-    // After successful creation, navigate to the event details or back to events list
-    router.push('/dashboard/events');
+    console.log('Updating event:', finalData);
+    // Here you would make the API call to update the event
+    router.push(`/dashboard/events/${eventId}`);
   };
 
   const handleCancel = () => {
-    router.push('/dashboard/events');
+    router.push(`/dashboard/events/${eventId}`);
   };
 
-  const handleBackToEvents = () => {
-    router.push('/dashboard/events');
+  const handleBackToEvent = () => {
+    router.push(`/dashboard/events/${eventId}`);
   };
+
+  if (loading) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center h-64">
+          <div className="text-slate-600">Loading event data...</div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
@@ -75,15 +132,15 @@ export default function CreateEventPage() {
             <Button 
               variant="outline" 
               size="sm" 
-              onClick={handleBackToEvents}
+              onClick={handleBackToEvent}
               className="bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border-slate-200 hover:scale-105 transition-all duration-200"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Events
+              Back to Event
             </Button>
             <div>
-              <h1 className="text-3xl font-bold text-slate-900">Create New Event</h1>
-              <p className="text-slate-600 mt-2">Fill in the details to create your event</p>
+              <h1 className="text-3xl font-bold text-slate-900">Edit Event</h1>
+              <p className="text-slate-600 mt-2">Update your event details</p>
             </div>
           </div>
           <div className="flex items-center space-x-3">
@@ -100,7 +157,7 @@ export default function CreateEventPage() {
               className="bg-slate-900 hover:bg-slate-800 text-white hover:scale-105 transition-all duration-200"
             >
               <Eye className="h-4 w-4 mr-2" />
-              Publish Event
+              Update & Publish
             </Button>
           </div>
         </div>
@@ -290,12 +347,13 @@ export default function CreateEventPage() {
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
                     Registration Type
-                  </label>                <select
-                  name="registration_type"
-                  value={formData.registration_type}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-200 focus:border-slate-300 transition-all duration-200"
-                >
+                  </label>
+                  <select
+                    name="registration_type"
+                    value={formData.registration_type}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-200 focus:border-slate-300 transition-all duration-200"
+                  >
                     <option value={RegistrationType.OPEN}>Open Registration</option>
                     <option value={RegistrationType.INVITATION_ONLY}>Invitation Only</option>
                     <option value={RegistrationType.APPROVAL_REQUIRED}>Approval Required</option>
@@ -380,7 +438,7 @@ export default function CreateEventPage() {
               className="bg-slate-900 hover:bg-slate-800 text-white hover:scale-105 transition-all duration-200"
             >
               <Eye className="h-4 w-4 mr-2" />
-              Publish Event
+              Update & Publish
             </Button>
           </div>
         </form>

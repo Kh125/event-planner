@@ -4,6 +4,7 @@ import { DashboardLayout } from '@/components/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Calendar, Users, Building, TrendingUp, Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 // Sample data
 const stats = [
@@ -85,13 +86,14 @@ export default function DashboardPage() {
             <h1 className="text-3xl font-bold text-slate-900">Dashboard</h1>
             <p className="text-slate-600 mt-3 text-lg">Welcome back! Here's what's happening with your events.</p>
           </div>
-          <Button 
-            onClick={handleCreateEvent}
-            className="bg-slate-900 hover:bg-slate-800 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-6 py-2.5 hover:scale-105"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Create Event
-          </Button>
+          <Link href="/dashboard/events/create" prefetch={true}>
+            <Button 
+              className="bg-slate-900 hover:bg-slate-800 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-6 py-2.5 hover:scale-105"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Create Event
+            </Button>
+          </Link>
         </div>
 
         {/* Stats Grid */}

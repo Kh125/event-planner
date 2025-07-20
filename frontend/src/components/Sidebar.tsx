@@ -39,22 +39,22 @@ export function Sidebar({ className, onCollapse }: SidebarProps) {
   
   return (
     <div className={cn(
-      "relative bg-white/90 backdrop-blur-sm border-r border-gray-200/50 text-gray-900 transition-all duration-300",
+      "relative bg-white border-r border-gray-200 text-gray-900 transition-all duration-300",
       isCollapsed ? "w-16" : "w-64",
       className
     )}>
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200/50 bg-gradient-to-r from-blue-50/30 to-purple-50/30">
+      <div className="flex items-center justify-between p-4 border-b border-gray-200">
         {!isCollapsed && (
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
+            <div className="w-8 h-8 bg-gray-900 rounded-md flex items-center justify-center">
               <span className="text-white font-bold text-sm">E</span>
             </div>
-            <h1 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">EventPro</h1>
+            <h1 className="text-lg font-semibold text-gray-900">EventPro</h1>
           </div>
         )}
         {isCollapsed && (
-          <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center mx-auto">
+          <div className="w-8 h-8 bg-gray-900 rounded-md flex items-center justify-center mx-auto">
             <span className="text-white font-bold text-sm">E</span>
           </div>
         )}
@@ -62,7 +62,7 @@ export function Sidebar({ className, onCollapse }: SidebarProps) {
           variant="ghost"
           size="icon"
           onClick={toggleSidebar}
-          className="text-gray-400 hover:text-gray-600 hover:bg-gray-100/50"
+          className="text-gray-400 hover:text-gray-600 hover:bg-gray-100"
         >
           {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
         </Button>
@@ -70,14 +70,14 @@ export function Sidebar({ className, onCollapse }: SidebarProps) {
       
       {/* Navigation */}
       <nav className="mt-4 px-2">
-        <ul className="space-y-2">
+        <ul className="space-y-1">
           {navigation.map((item) => (
             <li key={item.name}>
               <a
                 href={item.href}
                 className={cn(
-                  "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-all duration-200",
-                  "text-gray-600 hover:text-gray-900 hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-purple-50/50",
+                  "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors",
+                  "text-gray-700 hover:text-gray-900 hover:bg-gray-100",
                   isCollapsed ? "justify-center" : "justify-start"
                 )}
                 title={isCollapsed ? item.name : undefined}

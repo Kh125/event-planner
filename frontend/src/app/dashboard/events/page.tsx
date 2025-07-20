@@ -87,7 +87,7 @@ export default function EventsPage() {
             <h1 className="text-3xl font-bold text-gray-900">Events</h1>
             <p className="text-gray-600">Manage and organize your events</p>
           </div>
-          <Button className="bg-slate-600 hover:bg-slate-700">
+          <Button className="bg-gray-900 hover:bg-gray-800 text-white">
             <Plus className="mr-2 h-4 w-4" />
             Create Event
           </Button>
@@ -95,20 +95,20 @@ export default function EventsPage() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="bg-gradient-to-br from-blue-50/50 to-white border-blue-100">
+          <Card className="border border-gray-200">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-gray-600">Total Events</CardTitle>
-              <Calendar className="h-4 w-4 text-blue-600" />
+              <Calendar className="h-4 w-4 text-gray-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-gray-900">{events.length}</div>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-green-50/50 to-white border-green-100">
+          <Card className="border border-gray-200">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-gray-600">Total Attendees</CardTitle>
-              <Users className="h-4 w-4 text-green-600" />
+              <Users className="h-4 w-4 text-gray-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-gray-900">
@@ -117,10 +117,10 @@ export default function EventsPage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-purple-50/50 to-white border-purple-100">
+          <Card className="border border-gray-200">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-gray-600">Upcoming</CardTitle>
-              <Clock className="h-4 w-4 text-purple-600" />
+              <Clock className="h-4 w-4 text-gray-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-gray-900">{upcomingEvents.length}</div>

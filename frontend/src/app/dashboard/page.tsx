@@ -71,7 +71,7 @@ export default function DashboardPage() {
             <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
             <p className="text-gray-600">Welcome back! Here's what's happening with your events.</p>
           </div>
-          <Button className="bg-slate-600 hover:bg-slate-700">
+          <Button className="bg-gray-900 hover:bg-gray-800 text-white">
             <Plus className="mr-2 h-4 w-4" />
             Create Event
           </Button>
@@ -80,12 +80,7 @@ export default function DashboardPage() {
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {stats.map((stat, index) => (
-            <Card key={index} className={`${
-              index === 0 ? 'bg-gradient-to-br from-blue-50/50 to-white border-blue-100' :
-              index === 1 ? 'bg-gradient-to-br from-green-50/50 to-white border-green-100' :
-              index === 2 ? 'bg-gradient-to-br from-purple-50/50 to-white border-purple-100' :
-              'bg-gradient-to-br from-orange-50/50 to-white border-orange-100'
-            }`}>
+            <Card key={index} className="border border-gray-200">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium text-gray-600">
                   {stat.title}
@@ -109,22 +104,10 @@ export default function DashboardPage() {
           <CardContent>
             <div className="space-y-4">
               {recentEvents.map((event, index) => (
-                <div key={event.id} className={`flex items-center justify-between p-4 rounded-lg ${
-                  index % 3 === 0 ? 'bg-gradient-to-r from-blue-50/50 to-white border border-blue-100' :
-                  index % 3 === 1 ? 'bg-gradient-to-r from-green-50/50 to-white border border-green-100' :
-                  'bg-gradient-to-r from-purple-50/50 to-white border border-purple-100'
-                }`}>
+                <div key={event.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
                   <div className="flex items-center space-x-4">
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                      index % 3 === 0 ? 'bg-blue-100' :
-                      index % 3 === 1 ? 'bg-green-100' :
-                      'bg-purple-100'
-                    }`}>
-                      <Calendar className={`h-5 w-5 ${
-                        index % 3 === 0 ? 'text-blue-600' :
-                        index % 3 === 1 ? 'text-green-600' :
-                        'text-purple-600'
-                      }`} />
+                    <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center border border-gray-200">
+                      <Calendar className="h-5 w-5 text-gray-600" />
                     </div>
                     <div>
                       <h3 className="font-semibold text-gray-900">{event.title}</h3>

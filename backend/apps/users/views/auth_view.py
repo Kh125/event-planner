@@ -5,6 +5,8 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework import status
 from apps.users.serializers.auth_serializer import ForgetPasswordSerializer, RegisterSerializer, ResetPasswordSerializer, VerifyRegistrationSerializer
+from core.middleware.authentication import TokenAuthentication
+from core.middleware.permission import AllUserPermission
 from core.constants import ROLES
 from services.auth.auth_service import AuthenticationService
 from utils.response import CustomResponse
@@ -145,6 +147,7 @@ class VerifyRegisteredUserAPIView(CustomAPIView):
                
           return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@extend_schema(tags=["Authentication"])
 class ResendActivationAPIView(CustomAPIView):
      authentication_classes = []
      permission_classes = []
@@ -161,6 +164,7 @@ class ResendActivationAPIView(CustomAPIView):
           
           return Response(CustomResponse.success(message), status=status.HTTP_200_OK)
 
+@extend_schema(tags=["Authentication"])
 class ForgetPasswordAPIView(CustomAPIView):
      authentication_classes = []
      permission_classes = []
@@ -180,6 +184,7 @@ class ForgetPasswordAPIView(CustomAPIView):
                
           return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@extend_schema(tags=["Authentication"])
 class ResetPasswordAPIView(CustomAPIView):
      authentication_classes = []
      permission_classes = []
@@ -205,3 +210,17 @@ class ResetPasswordAPIView(CustomAPIView):
                )
                
           return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@extend_schema(tags=["Authentication"])
+class UserInfoAPIView(CustomAPIView):
+     authentication_classes = [TokenAuthentication]
+     permission_classes = [AllUserPermission]
+
+     def get(self, request):
+          response = AuthenticationService.get_user_profile_info(request.user)
+          
+          return self.success_response(
+               message="Username Information retrieved.",
+               data=response,
+               status_code=status.HTTP_200_OK
+          )

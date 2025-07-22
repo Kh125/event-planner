@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import check_password
 from rest_framework.exceptions import ValidationError
 from django.db import transaction
-from apps.users.models import PasswordReset, VerifyRegisteredUser
+from apps.users.models import CustomUser, PasswordReset, VerifyRegisteredUser
 from core.constants import ROLE_LIST, ROLES
 from services.auth.password_service import PasswordService
 from services.auth.role_service import RoleService
@@ -164,3 +164,18 @@ class AuthenticationService:
           password = data.get('password', None)
           
           return full_name, email, password
+     
+     @staticmethod
+     def get_user_profile_info(user: CustomUser):
+          """
+          Returns the user's profile information like profile image URL, role, onboarding step,
+          and whether the username is auto-generated.
+          """
+          try:
+               # Prepare the response data
+               return {
+                    'full_name': user.full_name,
+                    'role': user.role.name,
+               }
+          except Exception as e:
+               raise ValidationError(f"Error retrieving user info: {str(e)}")

@@ -87,7 +87,9 @@ export class AuthService {
         throw new Error(errorData.message || 'Login failed');
       }
 
-      return response.json();
+      const response_json = response.json()
+
+      return response_json['data'];
     } catch (error) {
       console.error('Login error:', error);
       throw error;
